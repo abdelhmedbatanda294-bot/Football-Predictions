@@ -4,7 +4,6 @@
 
 <head>
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>لوحة تحكم الأدمن</title>
@@ -78,6 +77,11 @@
       background: #0369a1;
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .logout {
       background: #b91c1c;
       width: auto;
@@ -131,10 +135,12 @@
     }
 
     .success {
+      display: block;
       background: #166534;
     }
 
     .error {
+      display: block;
       background: #991b1b;
     }
 
@@ -252,849 +258,1121 @@
 
 <body>
 
-<div class="container">
+  <div class="container">
 
-  <button class="logout" onclick="logout()">
-    تسجيل الخروج
-  </button>
-
-  <h1>⚙️ لوحة تحكم الأدمن</h1>
-
-  <div class="card">
-
-    <h2>⚡ إضافة المباريات القادمة</h2>
-
-    <p class="note">
-      اضغط على الزر لإضافة مباريات الجولة القادمة تلقائيًا إلى نظام التوقعات.
-    </p>
-
-    <button class="auto-button" onclick="addUpcomingMatches()">
-      ⚡ إضافة المباريات القادمة
+    <button class="logout" onclick="logout()">
+      تسجيل الخروج
     </button>
 
-    <div id="autoMessage" class="message"></div>
+    <h1>⚙️ لوحة تحكم الأدمن</h1>
 
-    <div id="upcomingList" class="match-list">
+    <!-- إضافة المباريات القادمة -->
+    <div class="card">
 
-      <strong>المباريات التي سيتم إضافتها:</strong>
+      <h2>⚡ إضافة المباريات القادمة</h2>
 
-      <div>Aston Villa × Nottingham Forest</div>
-      <div>Bournemouth × Brentford</div>
-      <div>Chelsea × Hull City</div>
-      <div>Crystal Palace × Ipswich Town</div>
-      <div>Liverpool × Fulham</div>
-      <div>Tottenham × Everton</div>
-      <div>Sunderland × Arsenal</div>
-      <div>Coventry City × Brighton</div>
-      <div>Manchester United × Manchester City</div>
-      <div>Leeds United × Newcastle United</div>
-      <div>Real Madrid × Rayo Vallecano</div>
-      <div>Levante × Barcelona</div>
-      <div>الأهلي × أبو قير للأسمدة</div>
-      <div>الزمالك × AS Port</div>
+      <p class="note">
+        اضغط على الزر لإضافة مباريات الجولة القادمة تلقائيًا إلى نظام التوقعات.
+      </p>
 
-    </div>
-  </div>
+      <button class="auto-button" onclick="addUpcomingMatches()">
+        ⚡ إضافة المباريات القادمة
+      </button>
 
-  <div class="card">
+      <div id="autoMessage" class="message"></div>
 
-    <h2>➕ إضافة مباراة جديدة يدويًا</h2>
+      <div id="upcomingList" class="match-list">
 
-    <p class="note">
-      استخدم هذا القسم إذا أردت إضافة مباراة غير موجودة في القائمة.
-    </p>
+        <strong>المباريات التي سيتم إضافتها:</strong>
 
-    <label>رقم المباراة</label>
-    <input id="newMatchId" type="text" placeholder="مثال: 1001">
+        <div>Aston Villa × Nottingham Forest</div>
+        <div>Bournemouth × Brentford</div>
+        <div>Chelsea × Hull City</div>
+        <div>Crystal Palace × Ipswich Town</div>
+        <div>Liverpool × Fulham</div>
+        <div>Tottenham × Everton</div>
+        <div>Sunderland × Arsenal</div>
+        <div>Coventry City × Brighton</div>
+        <div>Manchester United × Manchester City</div>
+        <div>Leeds United × Newcastle United</div>
+        <div>Real Madrid × Rayo Vallecano</div>
+        <div>Levante × Barcelona</div>
+        <div>الأهلي × أبو قير للأسمدة</div>
+        <div>الزمالك × AS Port</div>
 
-    <label>الفريق الأول</label>
-    <input id="newHomeTeam" type="text" placeholder="مثال: الأهلي">
-
-    <label>الفريق الثاني</label>
-    <input id="newAwayTeam" type="text" placeholder="مثال: الزمالك">
-
-    <button class="add-button" onclick="addMatch()">
-      ➕ إضافة المباراة
-    </button>
-
-    <div id="addMessage" class="message"></div>
-
-  </div>
-
-  <div class="card">
-
-    <h2>⚽ تسجيل نتيجة مباراة</h2>
-
-    <p class="note">
-      بعد انتهاء المباراة، اختر المباراة وسجل النتيجة الفعلية لتحديث نقاط المتسابقين.
-    </p>
-
-    <label>اختار المباراة</label>
-
-    <select id="matchSelect">
-      <option value="">جاري تحميل المباريات...</option>
-    </select>
-
-    <label>أهداف الفريق الأول</label>
-    <input id="actualHome" type="number" min="0" placeholder="0">
-
-    <label>أهداف الفريق الثاني</label>
-    <input id="actualAway" type="number" min="0" placeholder="0">
-
-    <button onclick="updateResult()">
-      ✅ حفظ النتيجة وتحديث النقاط
-    </button>
-
-    <div id="message" class="message"></div>
-
-  </div>
-
-  <div class="card delete-card">
-
-    <h2>🗑️ حذف متسابق</h2>
-
-    <p class="note">
-      اختر المتسابق الذي تريد حذفه.
-      سيتم حذف المتسابق وجميع توقعاته نهائيًا.
-    </p>
-
-    <label>اختر المتسابق</label>
-
-    <select id="playerSelect">
-      <option value="">جاري تحميل المتسابقين...</option>
-    </select>
-
-    <button class="delete-button" onclick="deletePlayer()">
-      🗑️ حذف المتسابق وجميع توقعاته
-    </button>
-
-    <div id="deleteMessage" class="message"></div>
-
-  </div>
-
-  <div class="card">
-
-    <h2>👥 توقعات اللاعبين</h2>
-
-    <p class="note">
-      هنا تقدر تشوف كل لاعب توقّع إيه، وتاريخ ووقت التوقع،
-      وهل استخدم الـ Double، والنتيجة الفعلية والنقاط.
-    </p>
-
-    <button class="refresh-button" onclick="loadPredictions()">
-      🔄 تحديث توقعات اللاعبين
-    </button>
-
-    <div id="predictionsMessage" class="message"></div>
-
-    <div id="predictionCount" class="count-box">
-      جاري تحميل التوقعات...
+      </div>
     </div>
 
-    <div class="table-container">
+    <!-- إضافة مباراة يدويًا -->
+    <div class="card">
 
-      <table>
+      <h2>➕ إضافة مباراة جديدة يدويًا</h2>
 
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>اللاعب</th>
-            <th>الفريق المفضل</th>
-            <th>تاريخ ووقت التوقع</th>
-            <th>المباراة</th>
-            <th>التوقع</th>
-            <th>Double</th>
-            <th>النتيجة الفعلية</th>
-            <th>النقاط</th>
-          </tr>
-        </thead>
+      <p class="note">
+        استخدم هذا القسم إذا أردت إضافة مباراة غير موجودة في القائمة.
+      </p>
 
-        <tbody id="predictionsBody">
+      <label>رقم المباراة</label>
+      <input id="newMatchId" type="text" placeholder="مثال: 1001">
 
-          <tr>
-            <td colspan="9" class="empty">
-              جاري تحميل التوقعات...
-            </td>
-          </tr>
+      <label>الفريق الأول</label>
+      <input id="newHomeTeam" type="text" placeholder="مثال: الأهلي">
 
-        </tbody>
+      <label>الفريق الثاني</label>
+      <input id="newAwayTeam" type="text" placeholder="مثال: الزمالك">
 
-      </table>
+      <button class="add-button" onclick="addMatch()">
+        ➕ إضافة المباراة
+      </button>
+
+      <div id="addMessage" class="message"></div>
 
     </div>
 
+    <!-- تسجيل النتيجة -->
+    <div class="card">
+
+      <h2>⚽ تسجيل نتيجة مباراة</h2>
+
+      <p class="note">
+        بعد انتهاء المباراة، اختر المباراة وسجل النتيجة الفعلية لتحديث نقاط المتسابقين.
+      </p>
+
+      <label>اختار المباراة</label>
+
+      <select id="matchSelect">
+        <option value="">جاري تحميل المباريات...</option>
+      </select>
+
+      <label>أهداف الفريق الأول</label>
+      <input id="actualHome" type="number" min="0" placeholder="0">
+
+      <label>أهداف الفريق الثاني</label>
+      <input id="actualAway" type="number" min="0" placeholder="0">
+
+      <button onclick="updateResult()">
+        ✅ حفظ النتيجة وتحديث النقاط
+      </button>
+
+      <div id="message" class="message"></div>
+
+    </div>
+
+    <!-- حذف متسابق -->
+    <div class="card delete-card">
+
+      <h2>🗑️ حذف متسابق</h2>
+
+      <p class="note">
+        اختر المتسابق الذي تريد حذفه.
+        سيتم حذف المتسابق وجميع توقعاته نهائيًا.
+      </p>
+
+      <label>اختر المتسابق</label>
+
+      <select id="playerSelect">
+        <option value="">جاري تحميل المتسابقين...</option>
+      </select>
+
+      <button
+        id="deletePlayerButton"
+        class="delete-button"
+        onclick="deletePlayer()"
+      >
+        🗑️ حذف المتسابق وجميع توقعاته
+      </button>
+
+      <div id="deleteMessage" class="message"></div>
+
+    </div>
+
+    <!-- توقعات اللاعبين -->
+    <div class="card">
+
+      <h2>👥 توقعات اللاعبين</h2>
+
+      <p class="note">
+        هنا تقدر تشوف كل لاعب توقّع إيه، وتاريخ ووقت التوقع،
+        وهل استخدم الـ Double، والنتيجة الفعلية والنقاط.
+      </p>
+
+      <button class="refresh-button" onclick="loadPredictions()">
+        🔄 تحديث توقعات اللاعبين
+      </button>
+
+      <div id="predictionsMessage" class="message"></div>
+
+      <div id="predictionCount" class="count-box">
+        جاري تحميل التوقعات...
+      </div>
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اللاعب</th>
+              <th>الفريق المفضل</th>
+              <th>تاريخ ووقت التوقع</th>
+              <th>المباراة</th>
+              <th>التوقع</th>
+              <th>Double</th>
+              <th>النتيجة الفعلية</th>
+              <th>النقاط</th>
+            </tr>
+          </thead>
+
+          <tbody id="predictionsBody">
+
+            <tr>
+              <td colspan="9" class="empty">
+                جاري تحميل التوقعات...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
   </div>
 
-</div>
+  <script>
 
-<script>
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycby1B18pmAFH73KuLQthkJpGC2cZPbJXuO9rFQTPkABgG9EoQnuvNzH7EANytLZsM7kz/exec";
 
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbzEOfPV1rU7J8CyT37nVyFTNH7Fl5sEDPTAMI_7zibiWY9JnAzyNVVzNjX9Vqevjr_J/exec";
+    const userType =
+      localStorage.getItem("userType");
 
-const userType = localStorage.getItem("userType");
-
-if (userType !== "admin") {
-  window.location.href = "login.html";
-}
-
-let matches = [];
-
-const upcomingMatches = [
-  {
-    matchId: "72221252",
-    homeTeam: "Aston Villa",
-    awayTeam: "Nottingham Forest"
-  },
-  {
-    matchId: "72221254",
-    homeTeam: "Bournemouth",
-    awayTeam: "Brentford"
-  },
-  {
-    matchId: "72221256",
-    homeTeam: "Chelsea",
-    awayTeam: "Hull City"
-  },
-  {
-    matchId: "72221260",
-    homeTeam: "Crystal Palace",
-    awayTeam: "Ipswich Town"
-  },
-  {
-    matchId: "72221264",
-    homeTeam: "Liverpool",
-    awayTeam: "Fulham"
-  },
-  {
-    matchId: "72221270",
-    homeTeam: "Tottenham",
-    awayTeam: "Everton"
-  },
-  {
-    matchId: "72221268",
-    homeTeam: "Sunderland",
-    awayTeam: "Arsenal"
-  },
-  {
-    matchId: "72221258",
-    homeTeam: "Coventry City",
-    awayTeam: "Brighton"
-  },
-  {
-    matchId: "72221266",
-    homeTeam: "Manchester United",
-    awayTeam: "Manchester City"
-  },
-  {
-    matchId: "72221262",
-    homeTeam: "Leeds United",
-    awayTeam: "Newcastle United"
-  },
-  {
-    matchId: "72478558",
-    homeTeam: "Real Madrid",
-    awayTeam: "Rayo Vallecano"
-  },
-  {
-    matchId: "72478552",
-    homeTeam: "Levante",
-    awayTeam: "Barcelona"
-  },
-  {
-    matchId: "AHLY-20260915",
-    homeTeam: "الأهلي",
-    awayTeam: "أبو قير للأسمدة"
-  },
-  {
-    matchId: "ZAMALEK-20260912",
-    homeTeam: "الزمالك",
-    awayTeam: "AS Port"
-  }
-];
-
-async function addUpcomingMatches() {
-
-  const message = document.getElementById("autoMessage");
-
-  message.style.display = "block";
-  message.className = "message";
-  message.textContent = "⏳ جاري إضافة المباريات...";
-
-  let added = 0;
-  let failed = 0;
-
-  for (const match of upcomingMatches) {
-
-    try {
-
-      const response = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "addMatch",
-          matchId: match.matchId,
-          homeTeam: match.homeTeam,
-          awayTeam: match.awayTeam
-        })
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        added++;
-      } else {
-        failed++;
-      }
-
-    } catch (error) {
-      console.error(error);
-      failed++;
+    if (userType !== "admin") {
+      window.location.href = "login.html";
     }
-  }
 
-  message.className = "message success";
-  message.textContent =
-    `✅ تمت إضافة ${added} مباراة — ⚠️ ${failed} لم تتم إضافتها`;
+    let matches = [];
 
-  await loadMatches();
-}
-
-async function loadMatches() {
-
-  const select = document.getElementById("matchSelect");
-
-  try {
-
-    select.innerHTML =
-      `<option value="">جاري تحميل المباريات...</option>`;
-
-    const response = await fetch(
-      `${API_URL}?action=matches&t=${Date.now()}`,
+    const upcomingMatches = [
       {
-        cache: "no-store"
+        matchId: "72221252",
+        homeTeam: "Aston Villa",
+        awayTeam: "Nottingham Forest"
+      },
+      {
+        matchId: "72221254",
+        homeTeam: "Bournemouth",
+        awayTeam: "Brentford"
+      },
+      {
+        matchId: "72221256",
+        homeTeam: "Chelsea",
+        awayTeam: "Hull City"
+      },
+      {
+        matchId: "72221260",
+        homeTeam: "Crystal Palace",
+        awayTeam: "Ipswich Town"
+      },
+      {
+        matchId: "72221264",
+        homeTeam: "Liverpool",
+        awayTeam: "Fulham"
+      },
+      {
+        matchId: "72221270",
+        homeTeam: "Tottenham",
+        awayTeam: "Everton"
+      },
+      {
+        matchId: "72221268",
+        homeTeam: "Sunderland",
+        awayTeam: "Arsenal"
+      },
+      {
+        matchId: "72221258",
+        homeTeam: "Coventry City",
+        awayTeam: "Brighton"
+      },
+      {
+        matchId: "72221266",
+        homeTeam: "Manchester United",
+        awayTeam: "Manchester City"
+      },
+      {
+        matchId: "72221262",
+        homeTeam: "Leeds United",
+        awayTeam: "Newcastle United"
+      },
+      {
+        matchId: "72478558",
+        homeTeam: "Real Madrid",
+        awayTeam: "Rayo Vallecano"
+      },
+      {
+        matchId: "72478552",
+        homeTeam: "Levante",
+        awayTeam: "Barcelona"
+      },
+      {
+        matchId: "AHLY-20260915",
+        homeTeam: "الأهلي",
+        awayTeam: "أبو قير للأسمدة"
+      },
+      {
+        matchId: "ZAMALEK-20260912",
+        homeTeam: "الزمالك",
+        awayTeam: "AS Port"
       }
-    );
+    ];
 
-    if (!response.ok) {
-      throw new Error("HTTP Error");
-    }
 
-    const data = await response.json();
+    // ==========================================
+    // إضافة المباريات القادمة
+    // ==========================================
 
-    matches = data.matches || [];
+    async function addUpcomingMatches() {
 
-    select.innerHTML = "";
+      const message =
+        document.getElementById("autoMessage");
 
-    if (matches.length === 0) {
-      select.innerHTML =
-        `<option value="">لا توجد مباريات</option>`;
-      return;
-    }
+      message.style.display = "block";
+      message.className = "message";
+      message.textContent =
+        "⏳ جاري إضافة المباريات...";
 
-    matches.forEach(match => {
+      let added = 0;
+      let failed = 0;
 
-      const option = document.createElement("option");
+      for (const match of upcomingMatches) {
 
-      option.value = match.matchId;
+        try {
 
-      option.textContent =
-        `${match.matchId} - ${match.homeTeam} ضد ${match.awayTeam}`;
+          const response = await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+              action: "addMatch",
+              matchId: match.matchId,
+              homeTeam: match.homeTeam,
+              awayTeam: match.awayTeam
+            })
+          });
 
-      select.appendChild(option);
+          const result =
+            await response.json();
 
-    });
+          if (result.success) {
+            added++;
+          } else {
+            failed++;
+          }
 
-  } catch (error) {
+        } catch (error) {
 
-    console.error(error);
+          console.error(error);
+          failed++;
 
-    select.innerHTML =
-      `<option value="">تعذر تحميل المباريات</option>`;
+        }
 
-    showMessage("تعذر تحميل المباريات", false);
-  }
-}
+      }
 
-async function addMatch() {
+      message.className = "message success";
 
-  const matchId = document.getElementById("newMatchId").value.trim();
-  const homeTeam = document.getElementById("newHomeTeam").value.trim();
-  const awayTeam = document.getElementById("newAwayTeam").value.trim();
-
-  if (!matchId || !homeTeam || !awayTeam) {
-    showAddMessage("⚠️ أكمل بيانات المباراة", false);
-    return;
-  }
-
-  try {
-
-    const response = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "addMatch",
-        matchId,
-        homeTeam,
-        awayTeam
-      })
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-
-      showAddMessage("✅ تمت إضافة المباراة بنجاح", true);
-
-      document.getElementById("newMatchId").value = "";
-      document.getElementById("newHomeTeam").value = "";
-      document.getElementById("newAwayTeam").value = "";
+      message.textContent =
+        `✅ تمت إضافة ${added} مباراة — ⚠️ ${failed} لم تتم إضافتها`;
 
       await loadMatches();
 
-    } else {
-
-      showAddMessage(
-        result.message || "❌ تعذر إضافة المباراة",
-        false
-      );
-
     }
 
-  } catch (error) {
 
-    console.error(error);
+    // ==========================================
+    // تحميل المباريات
+    // ==========================================
 
-    showAddMessage(
-      "❌ حدث خطأ أثناء إضافة المباراة",
-      false
-    );
+    async function loadMatches() {
 
-  }
-}
+      const select =
+        document.getElementById("matchSelect");
 
-async function updateResult() {
+      try {
 
-  const matchId = document.getElementById("matchSelect").value;
-  const actualHome = document.getElementById("actualHome").value;
-  const actualAway = document.getElementById("actualAway").value;
+        select.innerHTML =
+          `<option value="">جاري تحميل المباريات...</option>`;
 
-  if (!matchId) {
-    showMessage("⚠️ اختار مباراة أولًا", false);
-    return;
-  }
+        const response = await fetch(
+          `${API_URL}?action=matches&t=${Date.now()}`,
+          {
+            cache: "no-store"
+          }
+        );
 
-  if (actualHome === "" || actualAway === "") {
-    showMessage("⚠️ أدخل نتيجة الفريقين", false);
-    return;
-  }
-
-  try {
-
-    const response = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "updateResult",
-        matchId,
-        actualHome: Number(actualHome),
-        actualAway: Number(actualAway)
-      })
-    });
-
-    const result = await response.json();
-
-    showMessage(
-      result.message ||
-      (result.success ? "تم حفظ النتيجة" : "تعذر حفظ النتيجة"),
-      result.success
-    );
-
-    if (result.success) {
-
-      document.getElementById("actualHome").value = "";
-      document.getElementById("actualAway").value = "";
-
-      await loadPredictions();
-    }
-
-  } catch (error) {
-
-    console.error(error);
-
-    showMessage(
-      "❌ حدث خطأ أثناء تسجيل النتيجة",
-      false
-    );
-
-  }
-}
-
-async function loadPredictions() {
-
-  const body = document.getElementById("predictionsBody");
-  const count = document.getElementById("predictionCount");
-
-  body.innerHTML = `
-    <tr>
-      <td colspan="9" class="empty">
-        ⏳ جاري تحميل التوقعات...
-      </td>
-    </tr>
-  `;
-
-  count.textContent = "⏳ جاري تحميل التوقعات...";
-
-  try {
-
-    const response = await fetch(
-      `${API_URL}?action=predictions&t=${Date.now()}`,
-      {
-        cache: "no-store"
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("HTTP Error");
-    }
-
-    const data = await response.json();
-
-    if (!data.success) {
-      throw new Error(data.message || "تعذر تحميل التوقعات");
-    }
-
-    const predictions = data.predictions || [];
-
-    count.textContent =
-      `👥 عدد التوقعات: ${predictions.length}`;
-
-    if (predictions.length === 0) {
-
-      body.innerHTML = `
-        <tr>
-          <td colspan="9" class="empty">
-            لا توجد توقعات حتى الآن
-          </td>
-        </tr>
-      `;
-
-      return;
-    }
-
-    body.innerHTML = "";
-
-    predictions.forEach((prediction, index) => {
-
-      const row = document.createElement("tr");
-
-      const doubleHTML = prediction.isDouble
-        ? `<span class="double-badge">⭐ Double</span>`
-        : `<span class="normal-badge">—</span>`;
-
-      const actualHTML =
-        prediction.finished &&
-        prediction.actualHome !== null &&
-        prediction.actualAway !== null
-          ? `
-            <span class="prediction-score">
-              ${prediction.actualHome} - ${prediction.actualAway}
-            </span>
-          `
-          : `<span class="pending">لم تنتهِ</span>`;
-
-      let pointsHTML;
-
-      if (
-        prediction.points === null ||
-        prediction.points === undefined
-      ) {
-
-        pointsHTML = `<span class="pending">—</span>`;
-
-      } else {
-
-        let className = "points ";
-
-        if (
-          prediction.points === 3 ||
-          prediction.points === 6
-        ) {
-          className += "points-three";
-        } else if (
-          prediction.points === 1 ||
-          prediction.points === 2
-        ) {
-          className += "points-one";
-        } else {
-          className += "points-zero";
+        if (!response.ok) {
+          throw new Error("HTTP Error");
         }
 
-        pointsHTML =
-          `<span class="${className}">${prediction.points}</span>`;
-      }
+        const data =
+          await response.json();
 
-      row.innerHTML = `
+        matches =
+          data.matches || [];
 
-        <td>${index + 1}</td>
+        select.innerHTML = "";
 
-        <td>
-          <strong>
-            ${escapeHtml(prediction.playerName)}
-          </strong>
-        </td>
+        if (matches.length === 0) {
 
-        <td>
-          ${escapeHtml(prediction.favoriteTeam || "—")}
-        </td>
+          select.innerHTML =
+            `<option value="">لا توجد مباريات</option>`;
 
-        <td>
-          <span class="date-time">
-            ${formatDateTime(prediction.timestamp)}
-          </span>
-        </td>
+          return;
 
-        <td>
-          ${escapeHtml(prediction.homeTeam)}
-          <strong> × </strong>
-          ${escapeHtml(prediction.awayTeam)}
-        </td>
+        }
 
-        <td>
-          <span class="prediction-score">
-            ${prediction.predictedHome} - ${prediction.predictedAway}
-          </span>
-        </td>
+        matches.forEach(match => {
 
-        <td>${doubleHTML}</td>
+          const option =
+            document.createElement("option");
 
-        <td>${actualHTML}</td>
+          option.value =
+            match.matchId;
 
-        <td>${pointsHTML}</td>
-      `;
+          option.textContent =
+            `${match.matchId} - ${match.homeTeam} ضد ${match.awayTeam}`;
 
-      body.appendChild(row);
-    });
+          select.appendChild(option);
 
-  } catch (error) {
+        });
 
-    console.error(error);
+      } catch (error) {
 
-    count.textContent = "❌ تعذر تحميل التوقعات";
+        console.error(error);
 
-    body.innerHTML = `
-      <tr>
-        <td colspan="9" class="empty">
-          ❌ حدث خطأ أثناء تحميل توقعات اللاعبين
-        </td>
-      </tr>
-    `;
-  }
-}
+        select.innerHTML =
+          `<option value="">تعذر تحميل المباريات</option>`;
 
-async function loadPlayers() {
-
-  const select = document.getElementById("playerSelect");
-
-  try {
-
-    select.innerHTML =
-      `<option value="">جاري تحميل المتسابقين...</option>`;
-
-    const response = await fetch(
-      `${API_URL}?action=predictions&t=${Date.now()}`,
-      {
-        cache: "no-store"
-      }
-    );
-
-    const data = await response.json();
-
-    const predictions = data.predictions || [];
-
-    const players = new Map();
-
-    predictions.forEach(prediction => {
-
-      if (prediction.playerId) {
-
-        players.set(
-          String(prediction.playerId),
-          prediction.playerName || prediction.playerId
+        showMessage(
+          "تعذر تحميل المباريات",
+          false
         );
 
       }
 
-    });
-
-    select.innerHTML =
-      `<option value="">اختر المتسابق</option>`;
-
-    if (players.size === 0) {
-
-      select.innerHTML =
-        `<option value="">لا يوجد متسابقون</option>`;
-
-      return;
     }
 
-    players.forEach((playerName, playerId) => {
 
-      const option = document.createElement("option");
+    // ==========================================
+    // إضافة مباراة يدويًا
+    // ==========================================
 
-      option.value = playerId;
-      option.textContent = `${playerName} - ${playerId}`;
+    async function addMatch() {
 
-      select.appendChild(option);
+      const matchId =
+        document.getElementById("newMatchId").value.trim();
 
-    });
+      const homeTeam =
+        document.getElementById("newHomeTeam").value.trim();
 
-  } catch (error) {
+      const awayTeam =
+        document.getElementById("newAwayTeam").value.trim();
 
-    console.error(error);
+      if (!matchId || !homeTeam || !awayTeam) {
 
-    select.innerHTML =
-      `<option value="">تعذر تحميل المتسابقين</option>`;
-  }
-}
+        showAddMessage(
+          "⚠️ أكمل بيانات المباراة",
+          false
+        );
 
-async function deletePlayer() {
+        return;
 
-  const select = document.getElementById("playerSelect");
-  const playerId = select.value;
-  const playerName =
-    select.options[select.selectedIndex]?.textContent || "";
+      }
 
-  if (!playerId) {
+      try {
 
-    showDeleteMessage(
-      "⚠️ اختر متسابقًا أولًا",
-      false
-    );
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "addMatch",
+            matchId,
+            homeTeam,
+            awayTeam
+          })
+        });
 
-    return;
-  }
+        const result =
+          await response.json();
 
-  const confirmed = confirm(
-    `هل أنت متأكد من حذف المتسابق:\n${playerName}\n\nسيتم حذف جميع توقعاته نهائيًا.`
-  );
+        if (result.success) {
 
-  if (!confirmed) {
-    return;
-  }
+          showAddMessage(
+            "✅ تمت إضافة المباراة بنجاح",
+            true
+          );
 
-  try {
+          document.getElementById("newMatchId").value = "";
+          document.getElementById("newHomeTeam").value = "";
+          document.getElementById("newAwayTeam").value = "";
 
-    showDeleteMessage(
-      "⏳ جاري حذف المتسابق...",
-      true
-    );
+          await loadMatches();
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "deletePlayer",
-        playerId
-      })
-    });
+        } else {
 
-    const result = await response.json();
+          showAddMessage(
+            result.message || "❌ تعذر إضافة المباراة",
+            false
+          );
 
-    showDeleteMessage(
-      result.message ||
-      (result.success
-        ? "تم حذف المتسابق بنجاح"
-        : "تعذر حذف المتسابق"),
-      result.success
-    );
+        }
 
-    if (result.success) {
+      } catch (error) {
 
-      await loadPlayers();
-      await loadPredictions();
+        console.error(error);
+
+        showAddMessage(
+          "❌ حدث خطأ أثناء إضافة المباراة",
+          false
+        );
+
+      }
 
     }
 
-  } catch (error) {
 
-    console.error(error);
+    // ==========================================
+    // تسجيل نتيجة مباراة
+    // ==========================================
 
-    showDeleteMessage(
-      "❌ حدث خطأ أثناء حذف المتسابق",
-      false
-    );
+    async function updateResult() {
 
-  }
-}
+      const matchId =
+        document.getElementById("matchSelect").value;
 
-function formatDateTime(value) {
+      const actualHome =
+        document.getElementById("actualHome").value;
 
-  if (!value) {
-    return "غير متاح";
-  }
+      const actualAway =
+        document.getElementById("actualAway").value;
 
-  const date = new Date(value);
+      if (!matchId) {
 
-  if (isNaN(date.getTime())) {
-    return escapeHtml(value);
-  }
+        showMessage(
+          "⚠️ اختار مباراة أولًا",
+          false
+        );
 
-  return date.toLocaleString("ar-EG", {
-    dateStyle: "short",
-    timeStyle: "short"
-  });
-}
+        return;
 
-function escapeHtml(value) {
+      }
 
-  if (value === null || value === undefined) {
-    return "";
-  }
+      if (
+        actualHome === "" ||
+        actualAway === ""
+      ) {
 
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+        showMessage(
+          "⚠️ أدخل نتيجة الفريقين",
+          false
+        );
 
-function showAddMessage(text, success) {
+        return;
 
-  const message = document.getElementById("addMessage");
+      }
 
-  message.textContent = text;
-  message.className = "message " + (success ? "success" : "error");
-  message.style.display = "block";
-}
+      try {
 
-function showMessage(text, success) {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "updateResult",
+            matchId,
+            actualHome: Number(actualHome),
+            actualAway: Number(actualAway)
+          })
+        });
 
-  const message = document.getElementById("message");
+        const result =
+          await response.json();
 
-  message.textContent = text;
-  message.className = "message " + (success ? "success" : "error");
-  message.style.display = "block";
-}
+        showMessage(
+          result.message ||
+          (
+            result.success
+              ? "تم حفظ النتيجة"
+              : "تعذر حفظ النتيجة"
+          ),
+          result.success
+        );
 
-function showDeleteMessage(text, success) {
+        if (result.success) {
 
-  const message = document.getElementById("deleteMessage");
+          document.getElementById("actualHome").value = "";
+          document.getElementById("actualAway").value = "";
 
-  message.textContent = text;
-  message.className = "message " + (success ? "success" : "error");
-  message.style.display = "block";
-}
+          await loadPredictions();
 
-function logout() {
+        }
 
-  localStorage.removeItem("userType");
+      } catch (error) {
 
-  window.location.href = "login.html";
-}
+        console.error(error);
 
-loadMatches();
-loadPredictions();
-loadPlayers();
+        showMessage(
+          "❌ حدث خطأ أثناء تسجيل النتيجة",
+          false
+        );
 
-</script>
+      }
+
+    }
+
+
+    // ==========================================
+    // تحميل التوقعات
+    // ==========================================
+
+    async function loadPredictions() {
+
+      const body =
+        document.getElementById("predictionsBody");
+
+      const count =
+        document.getElementById("predictionCount");
+
+      body.innerHTML = `
+        <tr>
+          <td colspan="9" class="empty">
+            ⏳ جاري تحميل التوقعات...
+          </td>
+        </tr>
+      `;
+
+      count.textContent =
+        "⏳ جاري تحميل التوقعات...";
+
+      try {
+
+        const response = await fetch(
+          `${API_URL}?action=predictions&t=${Date.now()}`,
+          {
+            cache: "no-store"
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("HTTP Error");
+        }
+
+        const data =
+          await response.json();
+
+        if (!data.success) {
+          throw new Error(
+            data.message || "تعذر تحميل التوقعات"
+          );
+        }
+
+        const predictions =
+          data.predictions || [];
+
+        count.textContent =
+          `👥 عدد التوقعات: ${predictions.length}`;
+
+        if (predictions.length === 0) {
+
+          body.innerHTML = `
+            <tr>
+              <td colspan="9" class="empty">
+                لا توجد توقعات حتى الآن
+              </td>
+            </tr>
+          `;
+
+          return;
+
+        }
+
+        body.innerHTML = "";
+
+        predictions.forEach(
+          (prediction, index) => {
+
+            const row =
+              document.createElement("tr");
+
+            const doubleHTML =
+              prediction.isDouble
+                ? `<span class="double-badge">⭐ Double</span>`
+                : `<span class="normal-badge">—</span>`;
+
+            const actualHTML =
+              prediction.finished &&
+              prediction.actualHome !== null &&
+              prediction.actualAway !== null
+                ? `
+                  <span class="prediction-score">
+                    ${prediction.actualHome} - ${prediction.actualAway}
+                  </span>
+                `
+                : `<span class="pending">لم تنتهِ</span>`;
+
+            let pointsHTML;
+
+            if (
+              prediction.points === null ||
+              prediction.points === undefined
+            ) {
+
+              pointsHTML =
+                `<span class="pending">—</span>`;
+
+            } else {
+
+              let className =
+                "points ";
+
+              if (
+                prediction.points === 3 ||
+                prediction.points === 6
+              ) {
+
+                className +=
+                  "points-three";
+
+              } else if (
+                prediction.points === 1 ||
+                prediction.points === 2
+              ) {
+
+                className +=
+                  "points-one";
+
+              } else {
+
+                className +=
+                  "points-zero";
+
+              }
+
+              pointsHTML =
+                `<span class="${className}">
+                  ${prediction.points}
+                </span>`;
+
+            }
+
+            row.innerHTML = `
+
+              <td>${index + 1}</td>
+
+              <td>
+                <strong>
+                  ${escapeHtml(prediction.playerName)}
+                </strong>
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  prediction.favoriteTeam || "—"
+                )}
+              </td>
+
+              <td>
+                <span class="date-time">
+                  ${formatDateTime(prediction.timestamp)}
+                </span>
+              </td>
+
+              <td>
+                ${escapeHtml(prediction.homeTeam)}
+                <strong> × </strong>
+                ${escapeHtml(prediction.awayTeam)}
+              </td>
+
+              <td>
+                <span class="prediction-score">
+                  ${prediction.predictedHome} -
+                  ${prediction.predictedAway}
+                </span>
+              </td>
+
+              <td>${doubleHTML}</td>
+
+              <td>${actualHTML}</td>
+
+              <td>${pointsHTML}</td>
+            `;
+
+            body.appendChild(row);
+
+          }
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+        count.textContent =
+          "❌ تعذر تحميل التوقعات";
+
+        body.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty">
+              ❌ حدث خطأ أثناء تحميل توقعات اللاعبين
+            </td>
+          </tr>
+        `;
+
+      }
+
+    }
+
+
+    // ==========================================
+    // تحميل المتسابقين
+    // ==========================================
+
+    async function loadPlayers() {
+
+      const select =
+        document.getElementById("playerSelect");
+
+      try {
+
+        select.innerHTML =
+          `<option value="">جاري تحميل المتسابقين...</option>`;
+
+        const response = await fetch(
+          `${API_URL}?action=predictions&t=${Date.now()}`,
+          {
+            cache: "no-store"
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("HTTP Error");
+        }
+
+        const data =
+          await response.json();
+
+        if (!data.success) {
+          throw new Error(
+            data.message || "تعذر تحميل المتسابقين"
+          );
+        }
+
+        const predictions =
+          data.predictions || [];
+
+        const players =
+          new Map();
+
+        predictions.forEach(prediction => {
+
+          if (prediction.playerId) {
+
+            players.set(
+              String(prediction.playerId),
+              prediction.playerName ||
+              prediction.playerId
+            );
+
+          }
+
+        });
+
+        select.innerHTML =
+          `<option value="">اختر المتسابق</option>`;
+
+        if (players.size === 0) {
+
+          select.innerHTML =
+            `<option value="">لا يوجد متسابقون</option>`;
+
+          return;
+
+        }
+
+        players.forEach(
+          (playerName, playerId) => {
+
+            const option =
+              document.createElement("option");
+
+            option.value =
+              playerId;
+
+            option.textContent =
+              `${playerName} - ${playerId}`;
+
+            select.appendChild(option);
+
+          }
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+        select.innerHTML =
+          `<option value="">تعذر تحميل المتسابقين</option>`;
+
+      }
+
+    }
+
+
+    // ==========================================
+    // حذف المتسابق - باستخدام GET
+    // ==========================================
+
+    async function deletePlayer() {
+
+      const select =
+        document.getElementById("playerSelect");
+
+      const button =
+        document.getElementById("deletePlayerButton");
+
+      const playerId =
+        select.value;
+
+      const selectedOption =
+        select.options[select.selectedIndex];
+
+      const playerName =
+        selectedOption
+          ? selectedOption.textContent
+          : "";
+
+      if (!playerId) {
+
+        showDeleteMessage(
+          "⚠️ اختر متسابقًا أولًا",
+          false
+        );
+
+        return;
+
+      }
+
+      const confirmed =
+        confirm(
+          `هل أنت متأكد من حذف المتسابق:
+${playerName}
+
+سيتم حذف جميع توقعاته نهائيًا.`
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+
+        button.disabled = true;
+        button.textContent =
+          "⏳ جاري حذف المتسابق...";
+
+        showDeleteMessage(
+          "⏳ جاري حذف المتسابق...",
+          true
+        );
+
+        const deleteURL =
+          `${API_URL}?action=deletePlayer&playerId=${encodeURIComponent(playerId)}&t=${Date.now()}`;
+
+        const response =
+          await fetch(
+            deleteURL,
+            {
+              method: "GET",
+              cache: "no-store"
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error("HTTP Error");
+        }
+
+        const result =
+          await response.json();
+
+        showDeleteMessage(
+          result.message ||
+          (
+            result.success
+              ? "تم حذف المتسابق بنجاح"
+              : "تعذر حذف المتسابق"
+          ),
+          result.success
+        );
+
+        if (result.success) {
+
+          select.value = "";
+
+          await loadPlayers();
+          await loadPredictions();
+
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+        showDeleteMessage(
+          "❌ حدث خطأ أثناء حذف المتسابق",
+          false
+        );
+
+      } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+          "🗑️ حذف المتسابق وجميع توقعاته";
+
+      }
+
+    }
+
+
+    // ==========================================
+    // تنسيق التاريخ والوقت
+    // ==========================================
+
+    function formatDateTime(value) {
+
+      if (!value) {
+        return "غير متاح";
+      }
+
+      const date =
+        new Date(value);
+
+      if (isNaN(date.getTime())) {
+        return escapeHtml(value);
+      }
+
+      return date.toLocaleString(
+        "ar-EG",
+        {
+          dateStyle: "short",
+          timeStyle: "short"
+        }
+      );
+
+    }
+
+
+    // ==========================================
+    // حماية النصوص
+    // ==========================================
+
+    function escapeHtml(value) {
+
+      if (
+        value === null ||
+        value === undefined
+      ) {
+        return "";
+      }
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    // ==========================================
+    // الرسائل
+    // ==========================================
+
+    function showAddMessage(text, success) {
+
+      const message =
+        document.getElementById("addMessage");
+
+      message.textContent =
+        text;
+
+      message.className =
+        "message " +
+        (success ? "success" : "error");
+
+      message.style.display =
+        "block";
+
+    }
+
+
+    function showMessage(text, success) {
+
+      const message =
+        document.getElementById("message");
+
+      message.textContent =
+        text;
+
+      message.className =
+        "message " +
+        (success ? "success" : "error");
+
+      message.style.display =
+        "block";
+
+    }
+
+
+    function showDeleteMessage(text, success) {
+
+      const message =
+        document.getElementById("deleteMessage");
+
+      message.textContent =
+        text;
+
+      message.className =
+        "message " +
+        (success ? "success" : "error");
+
+      message.style.display =
+        "block";
+
+    }
+
+
+    // ==========================================
+    // تسجيل الخروج
+    // ==========================================
+
+    function logout() {
+
+      localStorage.removeItem("userType");
+
+      window.location.href =
+        "login.html";
+
+    }
+
+
+    // ==========================================
+    // تشغيل الصفحة
+    // ==========================================
+
+    loadMatches();
+    loadPredictions();
+    loadPlayers();
+
+  </script>
 
 </body>
 </html>
+
