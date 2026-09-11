@@ -1,5 +1,5 @@
-
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -90,6 +90,14 @@
       background: #15803d;
     }
 
+    .auto-button {
+      background: #7c3aed;
+    }
+
+    .auto-button:hover {
+      background: #6d28d9;
+    }
+
     .result-button {
       background: #0284c7;
     }
@@ -116,7 +124,21 @@
       margin-bottom: 18px;
       line-height: 1.6;
     }
+
+    .match-list {
+      background: #0f172a;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+      line-height: 2;
+    }
+
+    .match-list div {
+      border-bottom: 1px solid #334155;
+      padding: 5px 0;
+    }
   </style>
+
 </head>
 
 <body>
@@ -129,63 +151,116 @@
 
   <h1>⚙️ لوحة تحكم الأدمن</h1>
 
-
   <!-- =========================
-       ADD MATCH
+       AUTO ADD UPCOMING MATCHES
   ========================= -->
 
   <div class="card">
 
-    <h2>➕ إضافة مباراة جديدة</h2>
+```
+<h2>⚡ إضافة المباريات القادمة</h2>
 
-    <p class="note">
-      استخدم هذا القسم لإضافة أي مباراة يدويًا في حالة عدم ظهورها من API-Football.
-    </p>
+<p class="note">
+  اضغط على الزر لإضافة مباريات الجولة القادمة تلقائيًا إلى نظام التوقعات.
+  سيتم إضافة مباريات الدوري الإنجليزي بالإضافة إلى مباريات ريال مدريد وبرشلونة والأهلي والزمالك.
+</p>
 
-    <label for="newMatchId">
-      رقم المباراة
-    </label>
+<button
+  class="auto-button"
+  onclick="addUpcomingMatches()"
+>
+  ⚡ إضافة المباريات القادمة
+</button>
 
-    <input
-      id="newMatchId"
-      type="text"
-      placeholder="مثال: 1001"
-    >
+<div
+  id="autoMessage"
+  class="message"
+></div>
 
-    <label for="newHomeTeam">
-      الفريق الأول
-    </label>
+<div
+  id="upcomingList"
+  class="match-list"
+>
+  <strong>المباريات التي سيتم إضافتها:</strong>
 
-    <input
-      id="newHomeTeam"
-      type="text"
-      placeholder="مثال: الأهلي"
-    >
+  <div>🏴 Aston Villa × Nottingham Forest</div>
+  <div>🏴 Bournemouth × Brentford</div>
+  <div>🏴 Chelsea × Hull City</div>
+  <div>🏴 Crystal Palace × Ipswich Town</div>
+  <div>🏴 Liverpool × Fulham</div>
+  <div>🏴 Tottenham × Everton</div>
+  <div>🏴 Sunderland × Arsenal</div>
+  <div>🏴 Coventry City × Brighton</div>
+  <div>🏴 Manchester United × Manchester City</div>
+  <div>🏴 Leeds United × Newcastle United</div>
 
-    <label for="newAwayTeam">
-      الفريق الثاني
-    </label>
+  <div>🇪🇸 Real Madrid × Rayo Vallecano</div>
+  <div>🇪🇸 Levante × Barcelona</div>
 
-    <input
-      id="newAwayTeam"
-      type="text"
-      placeholder="مثال: الزمالك"
-    >
-
-    <button
-      class="add-button"
-      onclick="addMatch()"
-    >
-      ➕ إضافة المباراة
-    </button>
-
-    <div
-      id="addMessage"
-      class="message"
-    ></div>
+  <div>🇪🇬 الأهلي × أبو قير للأسمدة</div>
+  <div>🇪🇬 الزمالك × AS Port</div>
+</div>
+```
 
   </div>
 
+  <!-- =========================
+       ADD MATCH MANUALLY
+  ========================= -->
+
+  <div class="card">
+
+```
+<h2>➕ إضافة مباراة جديدة يدويًا</h2>
+
+<p class="note">
+  استخدم هذا القسم إذا أردت إضافة مباراة غير موجودة في القائمة.
+</p>
+
+<label for="newMatchId">
+  رقم المباراة
+</label>
+
+<input
+  id="newMatchId"
+  type="text"
+  placeholder="مثال: 1001"
+>
+
+<label for="newHomeTeam">
+  الفريق الأول
+</label>
+
+<input
+  id="newHomeTeam"
+  type="text"
+  placeholder="مثال: الأهلي"
+>
+
+<label for="newAwayTeam">
+  الفريق الثاني
+</label>
+
+<input
+  id="newAwayTeam"
+  type="text"
+  placeholder="مثال: الزمالك"
+>
+
+<button
+  class="add-button"
+  onclick="addMatch()"
+>
+  ➕ إضافة المباراة
+</button>
+
+<div
+  id="addMessage"
+  class="message"
+></div>
+```
+
+  </div>
 
   <!-- =========================
        UPDATE RESULT
@@ -193,60 +268,61 @@
 
   <div class="card">
 
-    <h2>⚽ تسجيل نتيجة مباراة</h2>
+```
+<h2>⚽ تسجيل نتيجة مباراة</h2>
 
-    <p class="note">
-      بعد انتهاء المباراة، اختر المباراة وسجل النتيجة الفعلية لتحديث نقاط المتسابقين.
-    </p>
+<p class="note">
+  بعد انتهاء المباراة، اختر المباراة وسجل النتيجة الفعلية لتحديث نقاط المتسابقين.
+</p>
 
-    <label for="matchSelect">
-      اختار المباراة
-    </label>
+<label for="matchSelect">
+  اختار المباراة
+</label>
 
-    <select id="matchSelect">
-      <option value="">
-        جاري تحميل المباريات...
-      </option>
-    </select>
+<select id="matchSelect">
+  <option value="">
+    جاري تحميل المباريات...
+  </option>
+</select>
 
-    <label for="actualHome">
-      أهداف الفريق الأول
-    </label>
+<label for="actualHome">
+  أهداف الفريق الأول
+</label>
 
-    <input
-      id="actualHome"
-      type="number"
-      min="0"
-      placeholder="0"
-    >
+<input
+  id="actualHome"
+  type="number"
+  min="0"
+  placeholder="0"
+>
 
-    <label for="actualAway">
-      أهداف الفريق الثاني
-    </label>
+<label for="actualAway">
+  أهداف الفريق الثاني
+</label>
 
-    <input
-      id="actualAway"
-      type="number"
-      min="0"
-      placeholder="0"
-    >
+<input
+  id="actualAway"
+  type="number"
+  min="0"
+  placeholder="0"
+>
 
-    <button
-      class="result-button"
-      onclick="updateResult()"
-    >
-      ✅ حفظ النتيجة وتحديث النقاط
-    </button>
+<button
+  class="result-button"
+  onclick="updateResult()"
+>
+  ✅ حفظ النتيجة وتحديث النقاط
+</button>
 
-    <div
-      id="message"
-      class="message"
-    ></div>
+<div
+  id="message"
+  class="message"
+></div>
+```
 
   </div>
 
 </div>
-
 
 <script>
 
@@ -265,7 +341,6 @@ const API_URL =
 const userType =
   localStorage.getItem("userType");
 
-
 if (userType !== "admin") {
 
   window.location.href =
@@ -282,18 +357,244 @@ let matches = [];
 
 
 /* =========================
+   UPCOMING MATCHES
+========================= */
+
+const upcomingMatches = [
+
+  // Premier League - Next Round
+
+  {
+    matchId: "72221252",
+    homeTeam: "Aston Villa",
+    awayTeam: "Nottingham Forest"
+  },
+
+  {
+    matchId: "72221254",
+    homeTeam: "Bournemouth",
+    awayTeam: "Brentford"
+  },
+
+  {
+    matchId: "72221256",
+    homeTeam: "Chelsea",
+    awayTeam: "Hull City"
+  },
+
+  {
+    matchId: "72221260",
+    homeTeam: "Crystal Palace",
+    awayTeam: "Ipswich Town"
+  },
+
+  {
+    matchId: "72221264",
+    homeTeam: "Liverpool",
+    awayTeam: "Fulham"
+  },
+
+  {
+    matchId: "72221270",
+    homeTeam: "Tottenham",
+    awayTeam: "Everton"
+  },
+
+  {
+    matchId: "72221268",
+    homeTeam: "Sunderland",
+    awayTeam: "Arsenal"
+  },
+
+  {
+    matchId: "72221258",
+    homeTeam: "Coventry City",
+    awayTeam: "Brighton"
+  },
+
+  {
+    matchId: "72221266",
+    homeTeam: "Manchester United",
+    awayTeam: "Manchester City"
+  },
+
+  {
+    matchId: "72221262",
+    homeTeam: "Leeds United",
+    awayTeam: "Newcastle United"
+  },
+
+
+  // Real Madrid
+
+  {
+    matchId: "72478558",
+    homeTeam: "Real Madrid",
+    awayTeam: "Rayo Vallecano"
+  },
+
+
+  // Barcelona
+
+  {
+    matchId: "72478552",
+    homeTeam: "Levante",
+    awayTeam: "Barcelona"
+  },
+
+
+  // Al Ahly
+
+  {
+    matchId: "AHLY-20260915",
+    homeTeam: "الأهلي",
+    awayTeam: "أبو قير للأسمدة"
+  },
+
+
+  // Zamalek
+
+  {
+    matchId: "ZAMALEK-20260912",
+    homeTeam: "الزمالك",
+    awayTeam: "AS Port"
+  }
+
+];
+
+
+/* =========================
+   ADD ALL UPCOMING MATCHES
+========================= */
+
+async function addUpcomingMatches() {
+
+  const message =
+    document.getElementById("autoMessage");
+
+  message.style.display = "block";
+
+  message.className =
+    "message";
+
+  message.textContent =
+    "⏳ جاري إضافة المباريات...";
+
+
+  let added = 0;
+  let failed = 0;
+
+
+  for (
+    const match of upcomingMatches
+  ) {
+
+    try {
+
+      const response =
+        await fetch(
+          API_URL,
+          {
+            method: "POST",
+
+            body: JSON.stringify({
+
+              action:
+                "addMatch",
+
+              matchId:
+                match.matchId,
+
+              homeTeam:
+                match.homeTeam,
+
+              awayTeam:
+                match.awayTeam
+
+            })
+          }
+        );
+
+
+      if (!response.ok) {
+        throw new Error(
+          "HTTP Error"
+        );
+      }
+
+
+      const result =
+        await response.json();
+
+
+      if (result.success) {
+
+        added++;
+
+      } else {
+
+        failed++;
+
+      }
+
+
+    } catch (error) {
+
+      console.error(
+        "Error adding match:",
+        match,
+        error
+      );
+
+      failed++;
+
+    }
+
+  }
+
+
+  if (failed === 0) {
+
+    message.className =
+      "message success";
+
+    message.textContent =
+      `✅ تمت إضافة ${added} مباراة بنجاح`;
+
+  } else {
+
+    message.className =
+      "message success";
+
+    message.textContent =
+      `✅ تمت إضافة ${added} مباراة — ⚠️ ${failed} مباراة لم تتم إضافتها`;
+
+  }
+
+
+  await loadMatches();
+
+}
+
+
+/* =========================
    LOAD MATCHES
 ========================= */
 
 async function loadMatches() {
 
   const select =
-    document.getElementById("matchSelect");
+    document.getElementById(
+      "matchSelect"
+    );
+
 
   try {
 
     select.innerHTML =
-      `<option value="">جاري تحميل المباريات...</option>`;
+      `<option value="">
+        جاري تحميل المباريات...
+      </option>`;
 
 
     const response =
@@ -303,7 +604,9 @@ async function loadMatches() {
 
 
     if (!response.ok) {
-      throw new Error("HTTP Error");
+      throw new Error(
+        "HTTP Error"
+      );
     }
 
 
@@ -315,44 +618,57 @@ async function loadMatches() {
       data.matches || [];
 
 
-    select.innerHTML = "";
+    select.innerHTML =
+      "";
 
 
     if (matches.length === 0) {
 
       select.innerHTML =
-        `<option value="">لا توجد مباريات</option>`;
+        `<option value="">
+          لا توجد مباريات
+        </option>`;
 
       return;
 
     }
 
 
-    matches.forEach(match => {
+    matches.forEach(
+      match => {
 
-      const option =
-        document.createElement("option");
-
-
-      option.value =
-        match.matchId;
-
-
-      option.textContent =
-        `${match.matchId} - ${match.homeTeam} ضد ${match.awayTeam}`;
+        const option =
+          document.createElement(
+            "option"
+          );
 
 
-      select.appendChild(option);
+        option.value =
+          match.matchId;
 
-    });
+
+        option.textContent =
+          `${match.matchId} - ${match.homeTeam} ضد ${match.awayTeam}`;
+
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
 
 
   } catch (error) {
 
     console.error(error);
 
+
     select.innerHTML =
-      `<option value="">تعذر تحميل المباريات</option>`;
+      `<option value="">
+        تعذر تحميل المباريات
+      </option>`;
+
 
     showMessage(
       "تعذر تحميل المباريات",
@@ -365,28 +681,34 @@ async function loadMatches() {
 
 
 /* =========================
-   ADD MATCH
+   ADD MATCH MANUALLY
 ========================= */
 
 async function addMatch() {
 
   const matchId =
     document
-      .getElementById("newMatchId")
+      .getElementById(
+        "newMatchId"
+      )
       .value
       .trim();
 
 
   const homeTeam =
     document
-      .getElementById("newHomeTeam")
+      .getElementById(
+        "newHomeTeam"
+      )
       .value
       .trim();
 
 
   const awayTeam =
     document
-      .getElementById("newAwayTeam")
+      .getElementById(
+        "newAwayTeam"
+      )
       .value
       .trim();
 
@@ -435,7 +757,9 @@ async function addMatch() {
 
 
     if (!response.ok) {
-      throw new Error("HTTP Error");
+      throw new Error(
+        "HTTP Error"
+      );
     }
 
 
@@ -468,6 +792,7 @@ async function addMatch() {
 
       await loadMatches();
 
+
     } else {
 
       showAddMessage(
@@ -482,6 +807,7 @@ async function addMatch() {
   } catch (error) {
 
     console.error(error);
+
 
     showAddMessage(
       "❌ حدث خطأ أثناء إضافة المباراة",
@@ -501,19 +827,25 @@ async function updateResult() {
 
   const matchId =
     document
-      .getElementById("matchSelect")
+      .getElementById(
+        "matchSelect"
+      )
       .value;
 
 
   const actualHome =
     document
-      .getElementById("actualHome")
+      .getElementById(
+        "actualHome"
+      )
       .value;
 
 
   const actualAway =
     document
-      .getElementById("actualAway")
+      .getElementById(
+        "actualAway"
+      )
       .value;
 
 
@@ -572,7 +904,9 @@ async function updateResult() {
 
 
     if (!response.ok) {
-      throw new Error("HTTP Error");
+      throw new Error(
+        "HTTP Error"
+      );
     }
 
 
@@ -608,6 +942,7 @@ async function updateResult() {
   } catch (error) {
 
     console.error(error);
+
 
     showMessage(
       "❌ حدث خطأ أثناء تسجيل النتيجة",
@@ -697,7 +1032,6 @@ function logout() {
     "userType"
   );
 
-
   window.location.href =
     "login.html";
 
@@ -714,5 +1048,3 @@ loadMatches();
 
 </body>
 </html>
-
-
