@@ -1,13 +1,18 @@
-```html
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <title>توقعات المباريات</title>
 
   <style>
+
     * {
       box-sizing: border-box;
       font-family: Arial, sans-serif;
@@ -122,11 +127,20 @@
       gap: 8px;
       color: #facc15;
       margin-top: 8px;
+      cursor: pointer;
     }
 
     .double-box input {
       width: auto;
       margin: 0;
+      cursor: pointer;
+    }
+
+    .double-warning {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: 5px;
+      display: none;
     }
 
     .message {
@@ -171,7 +185,20 @@
       background: #475569;
     }
 
+    .loading {
+      text-align: center;
+      color: #cbd5e1;
+      padding: 20px;
+    }
+
+    .no-matches {
+      text-align: center;
+      color: #94a3b8;
+      padding: 20px;
+    }
+
     @media (max-width: 600px) {
+
       .teams {
         grid-template-columns: 1fr;
       }
@@ -183,34 +210,47 @@
       .scores {
         grid-template-columns: 1fr;
       }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
 <div class="container">
 
-  <button class="logout" onclick="logout()">
+
+  <button class="logout"
+          onclick="logout()">
+
     تسجيل الخروج
+
   </button>
 
-  <h1>⚽ توقعات مباريات كرة القدم</h1>
+
+  <h1>
+    ⚽ توقعات مباريات كرة القدم
+  </h1>
+
 
   <p class="subtitle">
     توقع النتائج وتابع ترتيب المتسابقين
   </p>
 
 
-  <!-- =========================
-       PLAYER DATA
-  ========================= -->
+  <!-- بيانات المتسابق -->
 
   <div class="card">
 
-    <h2>بيانات المتسابق</h2>
+    <h2>
+      بيانات المتسابق
+    </h2>
 
     <br>
+
 
     <label for="playerName">
       اسم المتسابق
@@ -221,6 +261,7 @@
       type="text"
       placeholder="اسمك"
     >
+
 
     <label for="favoriteTeam">
       الفريق المفضل
@@ -235,51 +276,67 @@
   </div>
 
 
-  <!-- =========================
-       MATCHES
-  ========================= -->
+  <!-- المباريات -->
 
   <div class="card">
 
-    <h2>المباريات</h2>
+    <h2>
+      ⚽ المباريات
+    </h2>
 
     <br>
 
+
     <div id="matchesContainer">
-      جاري تحميل المباريات...
+
+      <div class="loading">
+        جاري تحميل المباريات...
+      </div>
+
     </div>
 
+
     <button onclick="submitAllPredictions()">
-      حفظ كل التوقعات
+
+      💾 حفظ كل التوقعات
+
     </button>
+
 
     <div
       id="message"
-      class="message"
-    ></div>
+      class="message">
+    </div>
 
   </div>
 
 
-  <!-- =========================
-       LEADERBOARD
-  ========================= -->
+  <!-- الترتيب -->
 
   <div class="card">
 
-    <h2>🏆 ترتيب المتسابقين</h2>
+    <h2>
+      🏆 ترتيب المتسابقين
+    </h2>
 
     <br>
 
+
     <button
       class="refresh"
-      onclick="loadLeaderboard()"
-    >
-      تحديث الترتيب الآن
+      onclick="loadLeaderboard()">
+
+      🔄 تحديث الترتيب الآن
+
     </button>
 
+
     <div id="leaderboardContainer">
-      جاري تحميل الترتيب...
+
+      <div class="loading">
+        جاري تحميل الترتيب...
+      </div>
+
     </div>
 
   </div>
@@ -289,20 +346,21 @@
 
 <script>
 
-/* =========================
-   API URL
-========================= */
+
+/* =====================================================
+   API
+===================================================== */
 
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbwMAzPBOFvqJ2AHOIBDd_YgalC0ovIhBU35rqh6F3XgPQiE9DHE1dbBc5LaLiv6vF2GWg/exec";
+  "https://script.google.com/macros/s/AKfycbwMAzBPOFvqJ2AHOIBDd_YgalC0ovIhBU35rqh6F3XgPQiE9DHE1dbBc5LaLiv6vF2GWg/exec";
 
 
 let matches = [];
 
 
-/* =========================
-   USER TYPE
-========================= */
+/* =====================================================
+   CHECK USER
+===================================================== */
 
 const userType =
   localStorage.getItem("userType");
@@ -316,9 +374,9 @@ if (userType !== "player") {
 }
 
 
-/* =========================
+/* =====================================================
    PLAYER DATA
-========================= */
+===================================================== */
 
 document.getElementById(
   "playerName"
@@ -336,44 +394,154 @@ document.getElementById(
   ) || "";
 
 
-/* =========================
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =====================================================
    LOAD MATCHES
-========================= */
+===================================================== */
 
 async function loadMatches() {
+
+  const container =
+    document.getElementById(
+      "matchesContainer"
+    );
+
+
+  container.innerHTML =
+    '<div class="loading">جاري تحميل المباريات...</div>';
+
 
   try {
 
     const response =
       await fetch(
-        `${API_URL}?action=matches`
+
+        `${API_URL}?action=matches&t=${Date.now()}`,
+
+        {
+          method: "GET",
+          cache: "no-store"
+        }
+
       );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "HTTP Error: " +
+        response.status
+      );
+
+    }
+
 
     const data =
       await response.json();
 
+
+    console.log(
+      "MATCHES FROM SERVER:",
+      data
+    );
+
+
+    if (!data.success) {
+
+      throw new Error(
+        data.message ||
+        "فشل تحميل المباريات"
+      );
+
+    }
+
+
     matches =
-      data.matches || [];
+      Array.isArray(
+        data.matches
+      )
+        ? data.matches
+        : [];
+
 
     renderMatches();
 
+
   } catch (error) {
 
-    console.error(error);
-
-    showMessage(
-      "حدث خطأ أثناء تحميل المباريات",
-      false
+    console.error(
+      "LOAD MATCHES ERROR:",
+      error
     );
+
+
+    container.innerHTML = `
+
+      <div class="no-matches">
+
+        ❌ حدث خطأ أثناء تحميل المباريات
+
+        <br><br>
+
+        حاول تحديث الصفحة
+
+      </div>
+
+    `;
 
   }
 
 }
 
 
-/* =========================
+/* =====================================================
    RENDER MATCHES
-========================= */
+===================================================== */
 
 function renderMatches() {
 
@@ -383,10 +551,17 @@ function renderMatches() {
     );
 
 
-  if (matches.length === 0) {
+  if (!matches.length) {
 
-    container.innerHTML =
-      "<p>لا توجد مباريات حاليًا</p>";
+    container.innerHTML = `
+
+      <div class="no-matches">
+
+        لا توجد مباريات حاليًا
+
+      </div>
+
+    `;
 
     return;
 
@@ -396,97 +571,235 @@ function renderMatches() {
   container.innerHTML = "";
 
 
-  matches.forEach(match => {
+  matches.forEach(
+    (match) => {
 
-    const matchElement =
-      document.createElement("div");
-
-
-    matchElement.className =
-      "match";
+      const matchId =
+        String(match.matchId);
 
 
-    matchElement.innerHTML = `
+      const safeId =
+        matchId.replace(
+          /[^a-zA-Z0-9_-]/g,
+          "_"
+        );
 
-      <div class="teams">
 
-        <div class="team">
-          ${escapeHtml(match.homeTeam)}
+      const matchElement =
+        document.createElement(
+          "div"
+        );
+
+
+      matchElement.className =
+        "match";
+
+
+      matchElement.innerHTML = `
+
+        <div class="teams">
+
+          <div class="team">
+
+            ${escapeHtml(
+              match.homeTeam
+            )}
+
+          </div>
+
+
+          <div class="vs">
+            VS
+          </div>
+
+
+          <div class="team">
+
+            ${escapeHtml(
+              match.awayTeam
+            )}
+
+          </div>
+
         </div>
 
-        <div class="vs">
-          VS
+
+        <div class="scores">
+
+          <div>
+
+            <label>
+
+              أهداف
+              ${escapeHtml(
+                match.homeTeam
+              )}
+
+            </label>
+
+
+            <input
+
+              type="number"
+
+              min="0"
+
+              max="99"
+
+              id="home-${safeId}"
+
+              placeholder="0"
+
+            >
+
+          </div>
+
+
+          <div>
+
+            <label>
+
+              أهداف
+              ${escapeHtml(
+                match.awayTeam
+              )}
+
+            </label>
+
+
+            <input
+
+              type="number"
+
+              min="0"
+
+              max="99"
+
+              id="away-${safeId}"
+
+              placeholder="0"
+
+            >
+
+          </div>
+
         </div>
 
-        <div class="team">
-          ${escapeHtml(match.awayTeam)}
-        </div>
 
-      </div>
-
-
-      <div class="scores">
-
-        <div>
-
-          <label>
-            أهداف ${escapeHtml(match.homeTeam)}
-          </label>
+        <label class="double-box">
 
           <input
-            type="number"
-            min="0"
-            id="home-${match.matchId}"
-            placeholder="0"
+
+            type="checkbox"
+
+            class="double-checkbox"
+
+            data-match-id="${escapeHtml(
+              matchId
+            )}"
+
+            id="double-${safeId}"
+
+            onchange="handleDoubleSelection(this)"
+
           >
+
+          مباراة Double ×2
+
+        </label>
+
+
+        <div
+          class="double-warning"
+          id="warning-${safeId}">
+
+          ⚠️ مسموح بـ Double واحد فقط
 
         </div>
 
-
-        <div>
-
-          <label>
-            أهداف ${escapeHtml(match.awayTeam)}
-          </label>
-
-          <input
-            type="number"
-            min="0"
-            id="away-${match.matchId}"
-            placeholder="0"
-          >
-
-        </div>
-
-      </div>
+      `;
 
 
-      <label class="double-box">
+      container.appendChild(
+        matchElement
+      );
 
-        <input
-          type="checkbox"
-          id="double-${match.matchId}"
-        >
-
-        مباراة Double
-
-      </label>
-
-    `;
-
-
-    container.appendChild(
-      matchElement
-    );
-
-  });
+    }
+  );
 
 }
 
 
-/* =========================
-   SUBMIT PREDICTIONS
-========================= */
+/* =====================================================
+   DOUBLE SELECTION
+   يسمح بـ Double واحد فقط
+===================================================== */
+
+function handleDoubleSelection(
+  selectedCheckbox
+) {
+
+  const allDoubleCheckboxes =
+    document.querySelectorAll(
+      ".double-checkbox"
+    );
+
+
+  if (!selectedCheckbox.checked) {
+
+    return;
+
+  }
+
+
+  allDoubleCheckboxes.forEach(
+    checkbox => {
+
+      if (
+        checkbox !==
+        selectedCheckbox
+      ) {
+
+        checkbox.checked =
+          false;
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   GET SELECTED DOUBLE
+===================================================== */
+
+function getSelectedDoubleMatchId() {
+
+  const selected =
+    document.querySelector(
+      ".double-checkbox:checked"
+    );
+
+
+  if (!selected) {
+
+    return null;
+
+  }
+
+
+  return String(
+    selected.dataset.matchId
+  );
+
+}
+
+
+/* =====================================================
+   SUBMIT ALL PREDICTIONS
+===================================================== */
 
 async function submitAllPredictions() {
 
@@ -543,7 +856,10 @@ async function submitAllPredictions() {
     playerId =
       playerName
         .toLowerCase()
-        .replace(/\s+/g, "-") +
+        .replace(
+          /\s+/g,
+          "-"
+        ) +
       "-" +
       Date.now();
 
@@ -556,28 +872,70 @@ async function submitAllPredictions() {
   }
 
 
+  /*
+    التأكد مرة أخيرة أن هناك Double واحد فقط
+  */
+
+  const doubleCheckboxes =
+    document.querySelectorAll(
+      ".double-checkbox:checked"
+    );
+
+
+  if (
+    doubleCheckboxes.length > 1
+  ) {
+
+    showMessage(
+      "❌ مسموح بـ Double واحد فقط",
+      false
+    );
+
+    return;
+
+  }
+
+
+  const selectedDoubleId =
+    getSelectedDoubleMatchId();
+
+
   let savedCount = 0;
+
+
+  let errors = [];
 
 
   for (
     const match of matches
   ) {
 
+    const matchId =
+      String(match.matchId);
+
+
+    const safeId =
+      matchId.replace(
+        /[^a-zA-Z0-9_-]/g,
+        "_"
+      );
+
+
     const homeInput =
       document.getElementById(
-        `home-${match.matchId}`
+        `home-${safeId}`
       );
 
 
     const awayInput =
       document.getElementById(
-        `away-${match.matchId}`
+        `away-${safeId}`
       );
 
 
     const doubleInput =
       document.getElementById(
-        `double-${match.matchId}`
+        `double-${safeId}`
       );
 
 
@@ -602,6 +960,11 @@ async function submitAllPredictions() {
     }
 
 
+    const isDouble =
+      selectedDoubleId ===
+      matchId;
+
+
     const payload = {
 
       action:
@@ -617,7 +980,7 @@ async function submitAllPredictions() {
         favoriteTeam,
 
       matchId:
-        match.matchId,
+        matchId,
 
       homeTeam:
         match.homeTeam,
@@ -636,7 +999,7 @@ async function submitAllPredictions() {
         ),
 
       isDouble:
-        doubleInput.checked
+        isDouble
 
     };
 
@@ -645,14 +1008,20 @@ async function submitAllPredictions() {
 
       const response =
         await fetch(
+
           API_URL,
+
           {
+
             method: "POST",
+
             body:
               JSON.stringify(
                 payload
               )
+
           }
+
         );
 
 
@@ -660,44 +1029,112 @@ async function submitAllPredictions() {
         await response.json();
 
 
+      console.log(
+        "PREDICTION RESULT:",
+        result
+      );
+
+
       if (result.success) {
 
         savedCount++;
 
+      } else {
+
+        errors.push(
+          result.message ||
+          "حدث خطأ"
+        );
+
       }
+
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "SUBMIT ERROR:",
+        error
+      );
+
+
+      errors.push(
+        "تعذر الاتصال بالسيرفر"
+      );
 
     }
 
   }
 
 
-  showMessage(
+  if (savedCount > 0) {
 
-    `تم حفظ ${savedCount} توقع بنجاح`,
+    showMessage(
 
-    savedCount > 0
+      `✅ تم حفظ ${savedCount} توقع بنجاح`,
 
-  );
+      true
+
+    );
+
+  } else {
+
+    showMessage(
+
+      errors.length
+        ? "❌ " + errors[0]
+        : "⚠️ لم يتم حفظ أي توقع",
+
+      false
+
+    );
+
+  }
 
 }
 
 
-/* =========================
-   LEADERBOARD
-========================= */
+/* =====================================================
+   LOAD LEADERBOARD
+===================================================== */
 
 async function loadLeaderboard() {
+
+  const container =
+    document.getElementById(
+      "leaderboardContainer"
+    );
+
+
+  container.innerHTML =
+    '<div class="loading">جاري تحميل الترتيب...</div>';
+
 
   try {
 
     const response =
       await fetch(
-        `${API_URL}?action=leaderboard`
+
+        `${API_URL}?action=leaderboard&t=${Date.now()}`,
+
+        {
+
+          method: "GET",
+
+          cache: "no-store"
+
+        }
+
       );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "HTTP Error: " +
+        response.status
+      );
+
+    }
 
 
     const data =
@@ -711,21 +1148,27 @@ async function loadLeaderboard() {
 
   } catch (error) {
 
-    document.getElementById(
-      "leaderboardContainer"
-    ).innerHTML =
-      "<p>تعذر تحميل الترتيب</p>";
+    console.error(
+      "LEADERBOARD ERROR:",
+      error
+    );
+
+
+    container.innerHTML =
+      "<p>❌ تعذر تحميل الترتيب</p>";
 
   }
 
 }
 
 
-/* =========================
+/* =====================================================
    RENDER LEADERBOARD
-========================= */
+===================================================== */
 
-function renderLeaderboard(players) {
+function renderLeaderboard(
+  players
+) {
 
   const container =
     document.getElementById(
@@ -733,7 +1176,263 @@ function renderLeaderboard(players) {
     );
 
 
-  if (players.length === 0) {
+  if (!players.length) {
 
-    conta
-```
+    container.innerHTML = `
+
+      <div class="no-matches">
+
+        لا يوجد ترتيب حاليًا
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  let html = `
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>المركز</th>
+
+          <th>اللاعب</th>
+
+          <th>الفريق المفضل</th>
+
+          <th>النقاط</th>
+
+          <th>المباريات</th>
+
+          <th>Exact</th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody>
+
+  `;
+
+
+  players.forEach(
+    player => {
+
+      const rank =
+        Number(
+          player.rank
+        );
+
+
+      const firstClass =
+        rank === 1
+          ? "first-place"
+          : "";
+
+
+      html += `
+
+        <tr>
+
+          <td class="${firstClass}">
+
+            ${
+              rank === 1
+                ? "🥇"
+                : rank
+            }
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              player.playerName
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              player.favoriteTeam ||
+              "-"
+            )}
+
+          </td>
+
+
+          <td>
+
+            <strong>
+
+              ${Number(
+                player.totalPoints ||
+                0
+              )}
+
+            </strong>
+
+          </td>
+
+
+          <td>
+
+            ${Number(
+              player.playedMatches ||
+              0
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${Number(
+              player.exactMatches ||
+              0
+            )}
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+  );
+
+
+  html += `
+
+      </tbody>
+
+    </table>
+
+  `;
+
+
+  container.innerHTML =
+    html;
+
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+function showMessage(
+  text,
+  success
+) {
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  message.textContent =
+    text;
+
+
+  message.className =
+    "message " +
+    (
+      success
+        ? "success"
+        : "error"
+    );
+
+
+  message.style.display =
+    "block";
+
+
+  setTimeout(
+    () => {
+
+      message.style.display =
+        "none";
+
+    },
+    5000
+  );
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+function logout() {
+
+  localStorage.removeItem(
+    "userType"
+  );
+
+  localStorage.removeItem(
+    "playerName"
+  );
+
+  localStorage.removeItem(
+    "favoriteTeam"
+  );
+
+  localStorage.removeItem(
+    "playerId"
+  );
+
+
+  window.location.href =
+    "login.html";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+loadMatches();
+
+loadLeaderboard();
+
+
+/*
+  تحديث المباريات كل دقيقة
+*/
+
+setInterval(
+  loadMatches,
+  60000
+);
+
+
+/*
+  تحديث الترتيب كل 10 ثواني
+*/
+
+setInterval(
+  loadLeaderboard,
+  10000
+);
+
+</script>
+
+</body>
+
+</html>
+

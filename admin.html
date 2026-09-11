@@ -1,13 +1,19 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>لوحة تحكم الأدمن</title>
 
   <style>
+
     * {
       box-sizing: border-box;
       font-family: Arial, sans-serif;
@@ -21,7 +27,7 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1200px;
       margin: auto;
     }
 
@@ -29,6 +35,10 @@
       text-align: center;
       color: #38bdf8;
       margin-bottom: 25px;
+    }
+
+    h2 {
+      margin-top: 0;
     }
 
     .card {
@@ -102,12 +112,18 @@
       background: #0284c7;
     }
 
+    .refresh-button {
+      background: #f59e0b;
+      color: #111827;
+    }
+
     .message {
       display: none;
       padding: 12px;
       border-radius: 8px;
       text-align: center;
       margin-top: 10px;
+      margin-bottom: 10px;
     }
 
     .success {
@@ -137,6 +153,98 @@
       border-bottom: 1px solid #334155;
       padding: 5px 0;
     }
+
+    /* =========================
+       PREDICTIONS TABLE
+    ========================= */
+
+    .table-container {
+      overflow-x: auto;
+      background: #0f172a;
+      border-radius: 12px;
+      margin-top: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 950px;
+    }
+
+    th {
+      background: #334155;
+      color: #38bdf8;
+      padding: 14px 10px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #334155;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    tr:hover {
+      background: #1e293b;
+    }
+
+    .prediction-score {
+      font-size: 18px;
+      font-weight: bold;
+      color: #f8fafc;
+    }
+
+    .double-badge {
+      display: inline-block;
+      background: #7c3aed;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+
+    .normal-badge {
+      color: #94a3b8;
+    }
+
+    .points {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .points-three {
+      color: #22c55e;
+    }
+
+    .points-one {
+      color: #facc15;
+    }
+
+    .points-zero {
+      color: #ef4444;
+    }
+
+    .pending {
+      color: #94a3b8;
+    }
+
+    .count-box {
+      background: #0f172a;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px;
+      color: #94a3b8;
+    }
+
   </style>
 
 </head>
@@ -145,11 +253,18 @@
 
 <div class="container">
 
-  <button class="logout" onclick="logout()">
+  <button
+    class="logout"
+    onclick="logout()"
+  >
     تسجيل الخروج
   </button>
 
-  <h1>⚙️ لوحة تحكم الأدمن</h1>
+
+  <h1>
+    ⚙️ لوحة تحكم الأدمن
+  </h1>
+
 
   <!-- =========================
        AUTO ADD UPCOMING MATCHES
@@ -157,52 +272,97 @@
 
   <div class="card">
 
-```
-<h2>⚡ إضافة المباريات القادمة</h2>
+    <h2>
+      ⚡ إضافة المباريات القادمة
+    </h2>
 
-<p class="note">
-  اضغط على الزر لإضافة مباريات الجولة القادمة تلقائيًا إلى نظام التوقعات.
-  سيتم إضافة مباريات الدوري الإنجليزي بالإضافة إلى مباريات ريال مدريد وبرشلونة والأهلي والزمالك.
-</p>
+    <p class="note">
 
-<button
-  class="auto-button"
-  onclick="addUpcomingMatches()"
->
-  ⚡ إضافة المباريات القادمة
-</button>
+      اضغط على الزر لإضافة مباريات الجولة القادمة تلقائيًا إلى نظام التوقعات.
 
-<div
-  id="autoMessage"
-  class="message"
-></div>
+    </p>
 
-<div
-  id="upcomingList"
-  class="match-list"
->
-  <strong>المباريات التي سيتم إضافتها:</strong>
+    <button
+      class="auto-button"
+      onclick="addUpcomingMatches()"
+    >
+      ⚡ إضافة المباريات القادمة
+    </button>
 
-  <div>🏴 Aston Villa × Nottingham Forest</div>
-  <div>🏴 Bournemouth × Brentford</div>
-  <div>🏴 Chelsea × Hull City</div>
-  <div>🏴 Crystal Palace × Ipswich Town</div>
-  <div>🏴 Liverpool × Fulham</div>
-  <div>🏴 Tottenham × Everton</div>
-  <div>🏴 Sunderland × Arsenal</div>
-  <div>🏴 Coventry City × Brighton</div>
-  <div>🏴 Manchester United × Manchester City</div>
-  <div>🏴 Leeds United × Newcastle United</div>
+    <div
+      id="autoMessage"
+      class="message"
+    ></div>
 
-  <div>🇪🇸 Real Madrid × Rayo Vallecano</div>
-  <div>🇪🇸 Levante × Barcelona</div>
+    <div
+      id="upcomingList"
+      class="match-list"
+    >
 
-  <div>🇪🇬 الأهلي × أبو قير للأسمدة</div>
-  <div>🇪🇬 الزمالك × AS Port</div>
-</div>
-```
+      <strong>
+        المباريات التي سيتم إضافتها:
+      </strong>
+
+      <div>
+        🏴 Aston Villa × Nottingham Forest
+      </div>
+
+      <div>
+        🏴 Bournemouth × Brentford
+      </div>
+
+      <div>
+        🏴 Chelsea × Hull City
+      </div>
+
+      <div>
+        🏴 Crystal Palace × Ipswich Town
+      </div>
+
+      <div>
+        🏴 Liverpool × Fulham
+      </div>
+
+      <div>
+        🏴 Tottenham × Everton
+      </div>
+
+      <div>
+        🏴 Sunderland × Arsenal
+      </div>
+
+      <div>
+        🏴 Coventry City × Brighton
+      </div>
+
+      <div>
+        🏴 Manchester United × Manchester City
+      </div>
+
+      <div>
+        🏴 Leeds United × Newcastle United
+      </div>
+
+      <div>
+        🇪🇸 Real Madrid × Rayo Vallecano
+      </div>
+
+      <div>
+        🇪🇸 Levante × Barcelona
+      </div>
+
+      <div>
+        🇪🇬 الأهلي × أبو قير للأسمدة
+      </div>
+
+      <div>
+        🇪🇬 الزمالك × AS Port
+      </div>
+
+    </div>
 
   </div>
+
 
   <!-- =========================
        ADD MATCH MANUALLY
@@ -210,57 +370,60 @@
 
   <div class="card">
 
-```
-<h2>➕ إضافة مباراة جديدة يدويًا</h2>
+    <h2>
+      ➕ إضافة مباراة جديدة يدويًا
+    </h2>
 
-<p class="note">
-  استخدم هذا القسم إذا أردت إضافة مباراة غير موجودة في القائمة.
-</p>
+    <p class="note">
 
-<label for="newMatchId">
-  رقم المباراة
-</label>
+      استخدم هذا القسم إذا أردت إضافة مباراة غير موجودة في القائمة.
 
-<input
-  id="newMatchId"
-  type="text"
-  placeholder="مثال: 1001"
->
+    </p>
 
-<label for="newHomeTeam">
-  الفريق الأول
-</label>
+    <label>
+      رقم المباراة
+    </label>
 
-<input
-  id="newHomeTeam"
-  type="text"
-  placeholder="مثال: الأهلي"
->
+    <input
+      id="newMatchId"
+      type="text"
+      placeholder="مثال: 1001"
+    >
 
-<label for="newAwayTeam">
-  الفريق الثاني
-</label>
+    <label>
+      الفريق الأول
+    </label>
 
-<input
-  id="newAwayTeam"
-  type="text"
-  placeholder="مثال: الزمالك"
->
+    <input
+      id="newHomeTeam"
+      type="text"
+      placeholder="مثال: الأهلي"
+    >
 
-<button
-  class="add-button"
-  onclick="addMatch()"
->
-  ➕ إضافة المباراة
-</button>
+    <label>
+      الفريق الثاني
+    </label>
 
-<div
-  id="addMessage"
-  class="message"
-></div>
-```
+    <input
+      id="newAwayTeam"
+      type="text"
+      placeholder="مثال: الزمالك"
+    >
+
+    <button
+      class="add-button"
+      onclick="addMatch()"
+    >
+      ➕ إضافة المباراة
+    </button>
+
+    <div
+      id="addMessage"
+      class="message"
+    ></div>
 
   </div>
+
 
   <!-- =========================
        UPDATE RESULT
@@ -268,61 +431,171 @@
 
   <div class="card">
 
-```
-<h2>⚽ تسجيل نتيجة مباراة</h2>
+    <h2>
+      ⚽ تسجيل نتيجة مباراة
+    </h2>
 
-<p class="note">
-  بعد انتهاء المباراة، اختر المباراة وسجل النتيجة الفعلية لتحديث نقاط المتسابقين.
-</p>
+    <p class="note">
 
-<label for="matchSelect">
-  اختار المباراة
-</label>
+      بعد انتهاء المباراة، اختر المباراة وسجل النتيجة الفعلية لتحديث نقاط المتسابقين.
 
-<select id="matchSelect">
-  <option value="">
-    جاري تحميل المباريات...
-  </option>
-</select>
+    </p>
 
-<label for="actualHome">
-  أهداف الفريق الأول
-</label>
+    <label>
+      اختار المباراة
+    </label>
 
-<input
-  id="actualHome"
-  type="number"
-  min="0"
-  placeholder="0"
->
+    <select id="matchSelect">
 
-<label for="actualAway">
-  أهداف الفريق الثاني
-</label>
+      <option value="">
+        جاري تحميل المباريات...
+      </option>
 
-<input
-  id="actualAway"
-  type="number"
-  min="0"
-  placeholder="0"
->
+    </select>
 
-<button
-  class="result-button"
-  onclick="updateResult()"
->
-  ✅ حفظ النتيجة وتحديث النقاط
-</button>
+    <label>
+      أهداف الفريق الأول
+    </label>
 
-<div
-  id="message"
-  class="message"
-></div>
-```
+    <input
+      id="actualHome"
+      type="number"
+      min="0"
+      placeholder="0"
+    >
+
+    <label>
+      أهداف الفريق الثاني
+    </label>
+
+    <input
+      id="actualAway"
+      type="number"
+      min="0"
+      placeholder="0"
+    >
+
+    <button
+      class="result-button"
+      onclick="updateResult()"
+    >
+      ✅ حفظ النتيجة وتحديث النقاط
+    </button>
+
+    <div
+      id="message"
+      class="message"
+    ></div>
+
+  </div>
+
+
+  <!-- =========================
+       PLAYER PREDICTIONS
+  ========================= -->
+
+  <div class="card">
+
+    <h2>
+      👥 توقعات اللاعبين
+    </h2>
+
+    <p class="note">
+
+      هنا تقدر تشوف كل لاعب توقّع إيه في كل مباراة،
+      وهل استخدم الـ Double، والنتيجة الفعلية والنقاط بعد انتهاء المباراة.
+
+    </p>
+
+    <button
+      class="refresh-button"
+      onclick="loadPredictions()"
+    >
+      🔄 تحديث توقعات اللاعبين
+    </button>
+
+    <div
+      id="predictionsMessage"
+      class="message"
+    ></div>
+
+    <div
+      id="predictionCount"
+      class="count-box"
+    >
+      جاري تحميل التوقعات...
+    </div>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              #
+            </th>
+
+            <th>
+              اللاعب
+            </th>
+
+            <th>
+              الفريق المفضل
+            </th>
+
+            <th>
+              المباراة
+            </th>
+
+            <th>
+              التوقع
+            </th>
+
+            <th>
+              Double
+            </th>
+
+            <th>
+              النتيجة الفعلية
+            </th>
+
+            <th>
+              النقاط
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody
+          id="predictionsBody"
+        >
+
+          <tr>
+
+            <td
+              colspan="8"
+              class="empty"
+            >
+              جاري تحميل التوقعات...
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
 
   </div>
 
 </div>
+
 
 <script>
 
@@ -340,6 +613,7 @@ const API_URL =
 
 const userType =
   localStorage.getItem("userType");
+
 
 if (userType !== "admin") {
 
@@ -361,8 +635,6 @@ let matches = [];
 ========================= */
 
 const upcomingMatches = [
-
-  // Premier League - Next Round
 
   {
     matchId: "72221252",
@@ -424,17 +696,11 @@ const upcomingMatches = [
     awayTeam: "Newcastle United"
   },
 
-
-  // Real Madrid
-
   {
     matchId: "72478558",
     homeTeam: "Real Madrid",
     awayTeam: "Rayo Vallecano"
   },
-
-
-  // Barcelona
 
   {
     matchId: "72478552",
@@ -442,17 +708,11 @@ const upcomingMatches = [
     awayTeam: "Barcelona"
   },
 
-
-  // Al Ahly
-
   {
     matchId: "AHLY-20260915",
     homeTeam: "الأهلي",
     awayTeam: "أبو قير للأسمدة"
   },
-
-
-  // Zamalek
 
   {
     matchId: "ZAMALEK-20260912",
@@ -464,15 +724,18 @@ const upcomingMatches = [
 
 
 /* =========================
-   ADD ALL UPCOMING MATCHES
+   ADD UPCOMING MATCHES
 ========================= */
 
 async function addUpcomingMatches() {
 
   const message =
-    document.getElementById("autoMessage");
+    document.getElementById(
+      "autoMessage"
+    );
 
-  message.style.display = "block";
+  message.style.display =
+    "block";
 
   message.className =
     "message";
@@ -482,6 +745,7 @@ async function addUpcomingMatches() {
 
 
   let added = 0;
+
   let failed = 0;
 
 
@@ -512,15 +776,9 @@ async function addUpcomingMatches() {
                 match.awayTeam
 
             })
+
           }
         );
-
-
-      if (!response.ok) {
-        throw new Error(
-          "HTTP Error"
-        );
-      }
 
 
       const result =
@@ -537,12 +795,11 @@ async function addUpcomingMatches() {
 
       }
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
       console.error(
-        "Error adding match:",
-        match,
         error
       );
 
@@ -553,23 +810,11 @@ async function addUpcomingMatches() {
   }
 
 
-  if (failed === 0) {
+  message.className =
+    "message success";
 
-    message.className =
-      "message success";
-
-    message.textContent =
-      `✅ تمت إضافة ${added} مباراة بنجاح`;
-
-  } else {
-
-    message.className =
-      "message success";
-
-    message.textContent =
-      `✅ تمت إضافة ${added} مباراة — ⚠️ ${failed} مباراة لم تتم إضافتها`;
-
-  }
+  message.textContent =
+    `✅ تمت إضافة ${added} مباراة — ⚠️ ${failed} لم تتم إضافتها`;
 
 
   await loadMatches();
@@ -592,21 +837,28 @@ async function loadMatches() {
   try {
 
     select.innerHTML =
-      `<option value="">
+      `
+      <option value="">
         جاري تحميل المباريات...
-      </option>`;
+      </option>
+      `;
 
 
     const response =
       await fetch(
-        `${API_URL}?action=matches`
+        `${API_URL}?action=matches&t=${Date.now()}`,
+        {
+          cache: "no-store"
+        }
       );
 
 
     if (!response.ok) {
+
       throw new Error(
         "HTTP Error"
       );
+
     }
 
 
@@ -622,12 +874,16 @@ async function loadMatches() {
       "";
 
 
-    if (matches.length === 0) {
+    if (
+      matches.length === 0
+    ) {
 
       select.innerHTML =
-        `<option value="">
+        `
+        <option value="">
           لا توجد مباريات
-        </option>`;
+        </option>
+        `;
 
       return;
 
@@ -658,16 +914,21 @@ async function loadMatches() {
       }
     );
 
+  }
 
-  } catch (error) {
+  catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
 
     select.innerHTML =
-      `<option value="">
+      `
+      <option value="">
         تعذر تحميل المباريات
-      </option>`;
+      </option>
+      `;
 
 
     showMessage(
@@ -681,7 +942,7 @@ async function loadMatches() {
 
 
 /* =========================
-   ADD MATCH MANUALLY
+   ADD MATCH
 ========================= */
 
 async function addMatch() {
@@ -752,15 +1013,9 @@ async function addMatch() {
               awayTeam
 
           })
+
         }
       );
-
-
-    if (!response.ok) {
-      throw new Error(
-        "HTTP Error"
-      );
-    }
 
 
     const result =
@@ -792,8 +1047,9 @@ async function addMatch() {
 
       await loadMatches();
 
+    }
 
-    } else {
+    else {
 
       showAddMessage(
         result.message ||
@@ -803,10 +1059,13 @@ async function addMatch() {
 
     }
 
+  }
 
-  } catch (error) {
+  catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
 
     showAddMessage(
@@ -899,15 +1158,9 @@ async function updateResult() {
               Number(actualAway)
 
           })
+
         }
       );
-
-
-    if (!response.ok) {
-      throw new Error(
-        "HTTP Error"
-      );
-    }
 
 
     const result =
@@ -936,12 +1189,18 @@ async function updateResult() {
         "actualAway"
       ).value = "";
 
+
+      await loadPredictions();
+
     }
 
+  }
 
-  } catch (error) {
+  catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
 
     showMessage(
@@ -955,7 +1214,374 @@ async function updateResult() {
 
 
 /* =========================
-   ADD MESSAGE
+   LOAD PLAYER PREDICTIONS
+========================= */
+
+async function loadPredictions() {
+
+  const body =
+    document.getElementById(
+      "predictionsBody"
+    );
+
+  const count =
+    document.getElementById(
+      "predictionCount"
+    );
+
+
+  body.innerHTML =
+    `
+    <tr>
+      <td
+        colspan="8"
+        class="empty"
+      >
+        ⏳ جاري تحميل التوقعات...
+      </td>
+    </tr>
+    `;
+
+
+  count.textContent =
+    "⏳ جاري تحميل التوقعات...";
+
+
+  try {
+
+    const response =
+      await fetch(
+        `${API_URL}?action=predictions&t=${Date.now()}`,
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        "HTTP Error"
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      throw new Error(
+        data.message ||
+        "تعذر تحميل التوقعات"
+      );
+
+    }
+
+
+    const predictions =
+      data.predictions || [];
+
+
+    count.textContent =
+      `👥 عدد التوقعات: ${predictions.length}`;
+
+
+    if (
+      predictions.length === 0
+    ) {
+
+      body.innerHTML =
+        `
+        <tr>
+          <td
+            colspan="8"
+            class="empty"
+          >
+            لا توجد توقعات حتى الآن
+          </td>
+        </tr>
+        `;
+
+      return;
+
+    }
+
+
+    body.innerHTML =
+      "";
+
+
+    predictions.forEach(
+      (prediction, index) => {
+
+        const row =
+          document.createElement(
+            "tr"
+          );
+
+
+        let doubleHTML;
+
+        if (
+          prediction.isDouble
+        ) {
+
+          doubleHTML =
+            `
+            <span class="double-badge">
+              ⭐ Double
+            </span>
+            `;
+
+        }
+
+        else {
+
+          doubleHTML =
+            `
+            <span class="normal-badge">
+              —
+            </span>
+            `;
+
+        }
+
+
+        let actualHTML;
+
+        if (
+          prediction.finished &&
+          prediction.actualHome !== null &&
+          prediction.actualAway !== null
+        ) {
+
+          actualHTML =
+            `
+            <span class="prediction-score">
+              ${prediction.actualHome}
+              -
+              ${prediction.actualAway}
+            </span>
+            `;
+
+        }
+
+        else {
+
+          actualHTML =
+            `
+            <span class="pending">
+              لم تنتهِ
+            </span>
+            `;
+
+        }
+
+
+        let pointsHTML;
+
+        if (
+          prediction.points === null ||
+          prediction.points === undefined
+        ) {
+
+          pointsHTML =
+            `
+            <span class="pending">
+              —
+            </span>
+            `;
+
+        }
+
+        else {
+
+          let className =
+            "points ";
+
+          if (
+            prediction.points === 3 ||
+            prediction.points === 6
+          ) {
+
+            className +=
+              "points-three";
+
+          }
+
+          else if (
+            prediction.points === 1 ||
+            prediction.points === 2
+          ) {
+
+            className +=
+              "points-one";
+
+          }
+
+          else {
+
+            className +=
+              "points-zero";
+
+          }
+
+
+          pointsHTML =
+            `
+            <span class="${className}">
+              ${prediction.points}
+            </span>
+            `;
+
+        }
+
+
+        row.innerHTML = `
+
+          <td>
+            ${index + 1}
+          </td>
+
+          <td>
+            <strong>
+              ${escapeHtml(
+                prediction.playerName
+              )}
+            </strong>
+          </td>
+
+          <td>
+            ${escapeHtml(
+              prediction.favoriteTeam ||
+              "—"
+            )}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              prediction.homeTeam
+            )}
+
+            <strong>
+              ×
+            </strong>
+
+            ${escapeHtml(
+              prediction.awayTeam
+            )}
+          </td>
+
+          <td>
+            <span class="prediction-score">
+              ${prediction.predictedHome}
+              -
+              ${prediction.predictedAway}
+            </span>
+          </td>
+
+          <td>
+            ${doubleHTML}
+          </td>
+
+          <td>
+            ${actualHTML}
+          </td>
+
+          <td>
+            ${pointsHTML}
+          </td>
+
+        `;
+
+
+        body.appendChild(
+          row
+        );
+
+      }
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    count.textContent =
+      "❌ تعذر تحميل التوقعات";
+
+
+    body.innerHTML =
+      `
+      <tr>
+
+        <td
+          colspan="8"
+          class="empty"
+        >
+          ❌ حدث خطأ أثناء تحميل توقعات اللاعبين
+        </td>
+
+      </tr>
+      `;
+
+  }
+
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(
+  value
+) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
+
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================
+   MESSAGES
 ========================= */
 
 function showAddMessage(
@@ -987,10 +1613,6 @@ function showAddMessage(
 
 }
 
-
-/* =========================
-   RESULT MESSAGE
-========================= */
 
 function showMessage(
   text,
@@ -1043,6 +1665,8 @@ function logout() {
 ========================= */
 
 loadMatches();
+
+loadPredictions();
 
 </script>
 
