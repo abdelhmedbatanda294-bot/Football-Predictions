@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>تسجيل الدخول</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #cbd5e1;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    input,
+    select {
+      background: #334155;
+      color: white;
+    }
+
+    button {
+      background: #0284c7;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #0369a1;
+    }
+
+    .error {
+      display: none;
+      background: #991b1b;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="login-card">
+
+  <h1>⚽ توقعات المباريات</h1>
+
+  <p class="subtitle">
+    تسجيل الدخول
+  </p>
+
+  <div id="errorMessage" class="error"></div>
+
+  <form onsubmit="login(event)">
+
+    <label for="userType">نوع المستخدم</label>
+
+    <select id="userType" onchange="toggleFields()">
+      <option value="player">متسابق</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <div id="playerFields">
+
+      <label for="playerName">اسم المتسابق</label>
+
+      <input
+        id="playerName"
+        type="text"
+        placeholder="اكتب اسمك"
+      >
+
+      <label for="favoriteTeam">الفريق المفضل</label>
+
+      <input
+        id="favoriteTeam"
+        type="text"
+        placeholder="اكتب فريقك المفضل"
+      >
+
+    </div>
+
+    <div id="adminFields" style="display: none;">
+
+      <label for="adminUsername">اسم المستخدم</label>
+
+      <input
+        id="adminUsername"
+        type="text"
+        placeholder="اسم المستخدم"
+      >
+
+      <label for="adminPassword">كلمة المرور</label>
+
+      <input
+        id="adminPassword"
+        type="password"
+        placeholder="كلمة المرور"
+      >
+
+    </div>
+
+    <button type="submit">
+      تسجيل الدخول
+    </button>
+
+  </form>
+
+</div>
+
+<script>
+  function toggleFields() {
+    const userType = document.getElementById("userType").value;
+
+    document.getElementById("playerFields").style.display =
+      userType === "player" ? "block" : "none";
+
+    document.getElementById("adminFields").style.display =
+      userType === "admin" ? "block" : "none";
+  }
+
+  function login(event) {
+    event.preventDefault();
+
+    const userType = document.getElementById("userType").value;
+
+    if (userType === "player") {
+      const playerName = document
+        .getElementById("playerName")
+        .value
+        .trim();
+
+      const favoriteTeam = document
+        .getElementById("favoriteTeam")
+        .value
+        .trim();
+
+      if (!playerName) {
+        showError("اكتب اسم المتسابق");
+        return;
+      }
+
+      let playerId = localStorage.getItem("playerId");
+
+      if (!playerId) {
+        playerId =
+          playerName.toLowerCase().replace(/\s+/g, "-") +
+          "-" +
+          Date.now();
+
+        localStorage.setItem("playerId", playerId);
+      }
+
+      localStorage.setItem("userType", "player");
+      localStorage.setItem("playerName", playerName);
+      localStorage.setItem("favoriteTeam", favoriteTeam);
+
+      window.location.href = "index.html";
+
+    } else {
+      const username = document
+        .getElementById("adminUsername")
+        .value
+        .trim();
+
+      const password = document
+        .getElementById("adminPassword")
+        .value;
+
+      const correctUsername = "admin";
+      const correctPassword = "123456";
+
+      if (
+        username === correctUsername &&
+        password === correctPassword
+      ) {
+        localStorage.setItem("userType", "admin");
+        window.location.href = "admin.html";
+      } else {
+        showError("اسم المستخدم أو كلمة المرور غير صحيحة");
+      }
+    }
+  }
+
+  function showError(message) {
+    const errorMessage = document.getElementById("errorMessage");
+
+    errorMessage.textContent = message;
+    errorMessage.style.display = "block";
+  }
+</script>
+
+</body>
+</html>

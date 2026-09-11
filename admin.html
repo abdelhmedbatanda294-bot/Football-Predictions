@@ -1,0 +1,718 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>لوحة تحكم الأدمن</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #0f172a;
+      color: white;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 22px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    input,
+    select {
+      background: #334155;
+      color: white;
+    }
+
+    button {
+      background: #0284c7;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #0369a1;
+    }
+
+    .logout {
+      background: #b91c1c;
+      width: auto;
+      padding: 10px 18px;
+    }
+
+    .logout:hover {
+      background: #991b1b;
+    }
+
+    .add-button {
+      background: #16a34a;
+    }
+
+    .add-button:hover {
+      background: #15803d;
+    }
+
+    .result-button {
+      background: #0284c7;
+    }
+
+    .message {
+      display: none;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .success {
+      background: #166534;
+    }
+
+    .error {
+      background: #991b1b;
+    }
+
+    .note {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <button class="logout" onclick="logout()">
+    تسجيل الخروج
+  </button>
+
+  <h1>⚙️ لوحة تحكم الأدمن</h1>
+
+
+  <!-- =========================
+       ADD MATCH
+  ========================= -->
+
+  <div class="card">
+
+    <h2>➕ إضافة مباراة جديدة</h2>
+
+    <p class="note">
+      استخدم هذا القسم لإضافة أي مباراة يدويًا في حالة عدم ظهورها من API-Football.
+    </p>
+
+    <label for="newMatchId">
+      رقم المباراة
+    </label>
+
+    <input
+      id="newMatchId"
+      type="text"
+      placeholder="مثال: 1001"
+    >
+
+    <label for="newHomeTeam">
+      الفريق الأول
+    </label>
+
+    <input
+      id="newHomeTeam"
+      type="text"
+      placeholder="مثال: الأهلي"
+    >
+
+    <label for="newAwayTeam">
+      الفريق الثاني
+    </label>
+
+    <input
+      id="newAwayTeam"
+      type="text"
+      placeholder="مثال: الزمالك"
+    >
+
+    <button
+      class="add-button"
+      onclick="addMatch()"
+    >
+      ➕ إضافة المباراة
+    </button>
+
+    <div
+      id="addMessage"
+      class="message"
+    ></div>
+
+  </div>
+
+
+  <!-- =========================
+       UPDATE RESULT
+  ========================= -->
+
+  <div class="card">
+
+    <h2>⚽ تسجيل نتيجة مباراة</h2>
+
+    <p class="note">
+      بعد انتهاء المباراة، اختر المباراة وسجل النتيجة الفعلية لتحديث نقاط المتسابقين.
+    </p>
+
+    <label for="matchSelect">
+      اختار المباراة
+    </label>
+
+    <select id="matchSelect">
+      <option value="">
+        جاري تحميل المباريات...
+      </option>
+    </select>
+
+    <label for="actualHome">
+      أهداف الفريق الأول
+    </label>
+
+    <input
+      id="actualHome"
+      type="number"
+      min="0"
+      placeholder="0"
+    >
+
+    <label for="actualAway">
+      أهداف الفريق الثاني
+    </label>
+
+    <input
+      id="actualAway"
+      type="number"
+      min="0"
+      placeholder="0"
+    >
+
+    <button
+      class="result-button"
+      onclick="updateResult()"
+    >
+      ✅ حفظ النتيجة وتحديث النقاط
+    </button>
+
+    <div
+      id="message"
+      class="message"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   API URL
+========================= */
+
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbwMAzPBOFvqJ2AHOIBDd_YgalC0ovIhBU35rqh6F3XgPQiE9DHE1dbBc5LaLiv6vF2GWg/exec";
+
+
+/* =========================
+   ADMIN CHECK
+========================= */
+
+const userType =
+  localStorage.getItem("userType");
+
+
+if (userType !== "admin") {
+
+  window.location.href =
+    "login.html";
+
+}
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+let matches = [];
+
+
+/* =========================
+   LOAD MATCHES
+========================= */
+
+async function loadMatches() {
+
+  const select =
+    document.getElementById("matchSelect");
+
+  try {
+
+    select.innerHTML =
+      `<option value="">جاري تحميل المباريات...</option>`;
+
+
+    const response =
+      await fetch(
+        `${API_URL}?action=matches`
+      );
+
+
+    if (!response.ok) {
+      throw new Error("HTTP Error");
+    }
+
+
+    const data =
+      await response.json();
+
+
+    matches =
+      data.matches || [];
+
+
+    select.innerHTML = "";
+
+
+    if (matches.length === 0) {
+
+      select.innerHTML =
+        `<option value="">لا توجد مباريات</option>`;
+
+      return;
+
+    }
+
+
+    matches.forEach(match => {
+
+      const option =
+        document.createElement("option");
+
+
+      option.value =
+        match.matchId;
+
+
+      option.textContent =
+        `${match.matchId} - ${match.homeTeam} ضد ${match.awayTeam}`;
+
+
+      select.appendChild(option);
+
+    });
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    select.innerHTML =
+      `<option value="">تعذر تحميل المباريات</option>`;
+
+    showMessage(
+      "تعذر تحميل المباريات",
+      false
+    );
+
+  }
+
+}
+
+
+/* =========================
+   ADD MATCH
+========================= */
+
+async function addMatch() {
+
+  const matchId =
+    document
+      .getElementById("newMatchId")
+      .value
+      .trim();
+
+
+  const homeTeam =
+    document
+      .getElementById("newHomeTeam")
+      .value
+      .trim();
+
+
+  const awayTeam =
+    document
+      .getElementById("newAwayTeam")
+      .value
+      .trim();
+
+
+  if (
+    !matchId ||
+    !homeTeam ||
+    !awayTeam
+  ) {
+
+    showAddMessage(
+      "⚠️ أكمل بيانات المباراة",
+      false
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body: JSON.stringify({
+
+            action:
+              "addMatch",
+
+            matchId:
+              matchId,
+
+            homeTeam:
+              homeTeam,
+
+            awayTeam:
+              awayTeam
+
+          })
+        }
+      );
+
+
+    if (!response.ok) {
+      throw new Error("HTTP Error");
+    }
+
+
+    const result =
+      await response.json();
+
+
+    if (result.success) {
+
+      showAddMessage(
+        "✅ تمت إضافة المباراة بنجاح",
+        true
+      );
+
+
+      document.getElementById(
+        "newMatchId"
+      ).value = "";
+
+
+      document.getElementById(
+        "newHomeTeam"
+      ).value = "";
+
+
+      document.getElementById(
+        "newAwayTeam"
+      ).value = "";
+
+
+      await loadMatches();
+
+    } else {
+
+      showAddMessage(
+        result.message ||
+        "❌ تعذر إضافة المباراة",
+        false
+      );
+
+    }
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    showAddMessage(
+      "❌ حدث خطأ أثناء إضافة المباراة",
+      false
+    );
+
+  }
+
+}
+
+
+/* =========================
+   UPDATE RESULT
+========================= */
+
+async function updateResult() {
+
+  const matchId =
+    document
+      .getElementById("matchSelect")
+      .value;
+
+
+  const actualHome =
+    document
+      .getElementById("actualHome")
+      .value;
+
+
+  const actualAway =
+    document
+      .getElementById("actualAway")
+      .value;
+
+
+  if (!matchId) {
+
+    showMessage(
+      "⚠️ اختار مباراة أولًا",
+      false
+    );
+
+    return;
+
+  }
+
+
+  if (
+    actualHome === "" ||
+    actualAway === ""
+  ) {
+
+    showMessage(
+      "⚠️ أدخل نتيجة الفريقين",
+      false
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body: JSON.stringify({
+
+            action:
+              "updateResult",
+
+            matchId:
+              matchId,
+
+            actualHome:
+              Number(actualHome),
+
+            actualAway:
+              Number(actualAway)
+
+          })
+        }
+      );
+
+
+    if (!response.ok) {
+      throw new Error("HTTP Error");
+    }
+
+
+    const result =
+      await response.json();
+
+
+    showMessage(
+      result.message ||
+      (
+        result.success
+          ? "تم حفظ النتيجة"
+          : "تعذر حفظ النتيجة"
+      ),
+      result.success
+    );
+
+
+    if (result.success) {
+
+      document.getElementById(
+        "actualHome"
+      ).value = "";
+
+
+      document.getElementById(
+        "actualAway"
+      ).value = "";
+
+    }
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "❌ حدث خطأ أثناء تسجيل النتيجة",
+      false
+    );
+
+  }
+
+}
+
+
+/* =========================
+   ADD MESSAGE
+========================= */
+
+function showAddMessage(
+  text,
+  success
+) {
+
+  const message =
+    document.getElementById(
+      "addMessage"
+    );
+
+
+  message.textContent =
+    text;
+
+
+  message.className =
+    "message " +
+    (
+      success
+        ? "success"
+        : "error"
+    );
+
+
+  message.style.display =
+    "block";
+
+}
+
+
+/* =========================
+   RESULT MESSAGE
+========================= */
+
+function showMessage(
+  text,
+  success
+) {
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  message.textContent =
+    text;
+
+
+  message.className =
+    "message " +
+    (
+      success
+        ? "success"
+        : "error"
+    );
+
+
+  message.style.display =
+    "block";
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+function logout() {
+
+  localStorage.removeItem(
+    "userType"
+  );
+
+
+  window.location.href =
+    "login.html";
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadMatches();
+
+</script>
+
+</body>
+</html>
+
+
