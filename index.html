@@ -5,6 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>توقعات المباريات</title>
 
   <style>
@@ -197,6 +198,13 @@
       padding: 20px;
     }
 
+    .draft-info {
+      color: #facc15;
+      text-align: center;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
     @media (max-width: 600px) {
       .teams {
         grid-template-columns: 1fr;
@@ -215,739 +223,1249 @@
 
 <body>
 
-<div class="container">
+  <div class="container">
 
-  <button class="logout" onclick="logout()">
-    تسجيل الخروج
-  </button>
-
-  <h1>⚽ توقعات مباريات كرة القدم</h1>
-
-  <p class="subtitle">
-    توقع النتائج وتابع ترتيب المتسابقين
-  </p>
-
-  <div class="card">
-
-    <h2>بيانات المتسابق</h2>
-    <br>
-
-    <label for="playerName">اسم المتسابق</label>
-
-    <input
-      id="playerName"
-      type="text"
-      placeholder="اسمك"
-    >
-
-    <label for="favoriteTeam">الفريق المفضل</label>
-
-    <input
-      id="favoriteTeam"
-      type="text"
-      placeholder="فريقك المفضل"
-    >
-
-  </div>
-
-  <div class="card">
-
-    <h2>⚽ المباريات</h2>
-    <br>
-
-    <div id="matchesContainer">
-      <div class="loading">
-        جاري تحميل المباريات...
-      </div>
-    </div>
-
-    <button id="saveButton" onclick="submitAllPredictions()">
-      💾 حفظ كل التوقعات
+    <button class="logout" onclick="logout()">
+      تسجيل الخروج
     </button>
 
-    <div id="message" class="message"></div>
+    <h1>⚽ توقعات مباريات كرة القدم</h1>
 
-  </div>
+    <p class="subtitle">
+      توقع النتائج وتابع ترتيب المتسابقين
+    </p>
 
-  <div class="card">
+    <div class="card">
 
-    <h2>🏆 ترتيب المتسابقين</h2>
-    <br>
+      <h2>بيانات المتسابق</h2>
+      <br>
 
-    <button class="refresh" onclick="loadLeaderboard()">
-      🔄 تحديث الترتيب الآن
-    </button>
+      <label for="playerName">اسم المتسابق</label>
 
-    <div id="leaderboardContainer">
-      <div class="loading">
-        جاري تحميل الترتيب...
+      <input
+        id="playerName"
+        type="text"
+        placeholder="اسمك"
+      >
+
+      <label for="favoriteTeam">الفريق المفضل</label>
+
+      <input
+        id="favoriteTeam"
+        type="text"
+        placeholder="فريقك المفضل"
+      >
+
+    </div>
+
+    <div class="card">
+
+      <h2>⚽ المباريات</h2>
+      <br>
+
+      <div id="matchesContainer">
+        <div class="loading">
+          جاري تحميل المباريات...
+        </div>
       </div>
+
+      <div class="draft-info">
+        سيتم حفظ التوقعات المكتوبة مؤقتًا تلقائيًا
+      </div>
+
+      <button id="saveButton" onclick="submitAllPredictions()">
+        💾 حفظ كل التوقعات
+      </button>
+
+      <div id="message" class="message"></div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>🏆 ترتيب المتسابقين</h2>
+      <br>
+
+      <button class="refresh" onclick="loadLeaderboard()">
+        🔄 تحديث الترتيب الآن
+      </button>
+
+      <div id="leaderboardContainer">
+        <div class="loading">
+          جاري تحميل الترتيب...
+        </div>
+      </div>
+
     </div>
 
   </div>
 
-</div>
+  <script>
 
-<script>
+    /* =====================================================
+       API
+    ===================================================== */
 
-/* =====================================================
-   API
-===================================================== */
-
-// تم تعديل الرابط: بدون ?action=matches
-const API_URL = "https://script.google.com/macros/s/AKfycbxnicZ2MYTTFelm_VRvYk-HvEc3LekPFzEggTj7c_opqxnb0238S87Io9cOkO13hdJb/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzUDaeyhH8BhfSggAtSyGGvrlNkAe-pgEcwkFi2y01TD-UBhqSwOTAhiesIA3l9eF8r/exec";
 
 
-let matches = [];
+    const DRAFT_KEY = "footballPredictionsDraft";
+
+    let matches = [];
+
+    let isLoadingMatches = false;
+
+    let isSavingPredictions = false;
 
 
-/* =====================================================
-   CHECK USER
-===================================================== */
+    /* =====================================================
+       CHECK USER
+    ===================================================== */
 
-const userType = localStorage.getItem("userType");
+    const userType = localStorage.getItem("userType");
 
-if (userType !== "player") {
-  window.location.href = "login.html";
-}
-
-
-/* =====================================================
-   PLAYER DATA
-===================================================== */
-
-document.getElementById("playerName").value =
-  localStorage.getItem("playerName") || "";
-
-document.getElementById("favoriteTeam").value =
-  localStorage.getItem("favoriteTeam") || "";
+    if (userType !== "player") {
+      window.location.href = "login.html";
+    }
 
 
-/* =====================================================
-   ESCAPE HTML
-===================================================== */
+    /* =====================================================
+       PLAYER DATA
+    ===================================================== */
 
-function escapeHtml(value) {
+    document.getElementById("playerName").value =
+      localStorage.getItem("playerName") || "";
 
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+    document.getElementById("favoriteTeam").value =
+      localStorage.getItem("favoriteTeam") || "";
 
 
-/* =====================================================
-   LOAD MATCHES
-===================================================== */
+    /* =====================================================
+       ESCAPE HTML
+    ===================================================== */
 
-async function loadMatches() {
+    function escapeHtml(value) {
 
-  const container =
-    document.getElementById("matchesContainer");
-
-  container.innerHTML =
-    '<div class="loading">جاري تحميل المباريات...</div>';
-
-  try {
-
-    const response = await fetch(
-      `${API_URL}?action=matches&t=${Date.now()}`,
-      {
-        method: "GET",
-        cache: "no-store"
+      if (value === null || value === undefined) {
+        return "";
       }
-    );
 
-    if (!response.ok) {
-      throw new Error("HTTP Error: " + response.status);
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
     }
 
-    const data = await response.json();
 
-    console.log("MATCHES FROM SERVER:", data);
+    /* =====================================================
+       SAFE MATCH ID
+    ===================================================== */
 
-    if (!data.success) {
-      throw new Error(
-        data.message || "فشل تحميل المباريات"
+    function getSafeMatchId(matchId) {
+
+      return String(matchId).replace(
+        /[^a-zA-Z0-9_-]/g,
+        "_"
       );
+
     }
 
-    matches = Array.isArray(data.matches)
-      ? data.matches
-      : [];
 
-    renderMatches();
+    /* =====================================================
+       GET DRAFTS
+    ===================================================== */
 
-  } catch (error) {
+    function getDraftPredictions() {
 
-    console.error("LOAD MATCHES ERROR:", error);
+      try {
 
-    container.innerHTML = `
-      <div class="no-matches">
-        ❌ حدث خطأ أثناء تحميل المباريات
-        <br><br>
-        حاول تحديث الصفحة
-      </div>
-    `;
-  }
-}
+        const savedDraft =
+          localStorage.getItem(DRAFT_KEY);
 
+        if (!savedDraft) {
+          return {};
+        }
 
-/* =====================================================
-   RENDER MATCHES
-===================================================== */
+        const parsedDraft =
+          JSON.parse(savedDraft);
 
-function renderMatches() {
+        if (
+          parsedDraft &&
+          typeof parsedDraft === "object"
+        ) {
+          return parsedDraft;
+        }
 
-  const container =
-    document.getElementById("matchesContainer");
+        return {};
 
-  if (!matches.length) {
+      } catch (error) {
 
-    container.innerHTML = `
-      <div class="no-matches">
-        لا توجد مباريات حاليًا
-      </div>
-    `;
+        console.error(
+          "DRAFT READ ERROR:",
+          error
+        );
 
-    return;
-  }
+        return {};
 
-  container.innerHTML = "";
+      }
 
-  matches.forEach(match => {
-
-    const matchId = String(match.matchId);
-
-    const safeId = matchId.replace(
-      /[^a-zA-Z0-9_-]/g,
-      "_"
-    );
-
-    const matchElement = document.createElement("div");
-
-    matchElement.className = "match";
-
-    matchElement.innerHTML = `
-
-      <div class="teams">
-
-        <div class="team">
-          ${escapeHtml(match.homeTeam)}
-        </div>
-
-        <div class="vs">
-          VS
-        </div>
-
-        <div class="team">
-          ${escapeHtml(match.awayTeam)}
-        </div>
-
-      </div>
-
-      <div class="scores">
-
-        <div>
-
-          <label>
-            أهداف ${escapeHtml(match.homeTeam)}
-          </label>
-
-          <input
-            type="number"
-            min="0"
-            max="99"
-            id="home-${safeId}"
-            placeholder="0"
-          >
-
-        </div>
-
-        <div>
-
-          <label>
-            أهداف ${escapeHtml(match.awayTeam)}
-          </label>
-
-          <input
-            type="number"
-            min="0"
-            max="99"
-            id="away-${safeId}"
-            placeholder="0"
-          >
-
-        </div>
-
-      </div>
-
-      <label class="double-box">
-
-        <input
-          type="checkbox"
-          class="double-checkbox"
-          data-match-id="${escapeHtml(matchId)}"
-          id="double-${safeId}"
-          onchange="handleDoubleSelection(this)"
-        >
-
-        مباراة Double ×2
-
-      </label>
-
-      <div
-        class="double-warning"
-        id="warning-${safeId}">
-
-        ⚠️ مسموح بـ Double واحد فقط
-
-      </div>
-
-    `;
-
-    container.appendChild(matchElement);
-
-  });
-}
-
-
-/* =====================================================
-   DOUBLE SELECTION
-===================================================== */
-
-function handleDoubleSelection(selectedCheckbox) {
-
-  const allDoubleCheckboxes =
-    document.querySelectorAll(".double-checkbox");
-
-  if (!selectedCheckbox.checked) {
-    return;
-  }
-
-  allDoubleCheckboxes.forEach(checkbox => {
-
-    if (checkbox !== selectedCheckbox) {
-      checkbox.checked = false;
     }
 
-  });
-}
 
+    /* =====================================================
+       SAVE DRAFTS
+    ===================================================== */
 
-/* =====================================================
-   GET SELECTED DOUBLE
-===================================================== */
+    function saveDraftPredictions() {
 
-function getSelectedDoubleMatchId() {
+      try {
 
-  const selected =
-    document.querySelector(".double-checkbox:checked");
+        const oldDrafts =
+          getDraftPredictions();
 
-  if (!selected) {
-    return null;
-  }
+        const newDrafts = {
+          ...oldDrafts
+        };
 
-  return String(selected.dataset.matchId);
-}
+        document
+          .querySelectorAll(".match")
+          .forEach(matchElement => {
 
+            const matchId =
+              matchElement.dataset.matchId;
 
-/* =====================================================
-   SUBMIT ALL PREDICTIONS
-===================================================== */
+            if (!matchId) {
+              return;
+            }
 
-async function submitAllPredictions() {
+            const safeId =
+              getSafeMatchId(matchId);
 
-  const playerName =
-    document.getElementById("playerName").value.trim();
+            const homeInput =
+              document.getElementById(
+                `home-${safeId}`
+              );
 
-  const favoriteTeam =
-    document.getElementById("favoriteTeam").value.trim();
+            const awayInput =
+              document.getElementById(
+                `away-${safeId}`
+              );
 
-  if (!playerName) {
+            const doubleInput =
+              document.getElementById(
+                `double-${safeId}`
+              );
 
-    showMessage("اكتب اسمك أولًا", false);
+            if (
+              !homeInput ||
+              !awayInput ||
+              !doubleInput
+            ) {
+              return;
+            }
 
-    return;
-  }
+            newDrafts[matchId] = {
 
-  localStorage.setItem("playerName", playerName);
+              predictedHome:
+                homeInput.value,
 
-  localStorage.setItem("favoriteTeam", favoriteTeam);
+              predictedAway:
+                awayInput.value,
 
-  let playerId = localStorage.getItem("playerId");
+              isDouble:
+                doubleInput.checked
 
-  if (!playerId) {
+            };
 
-    playerId =
-      playerName.toLowerCase().replace(/\s+/g, "-") +
-      "-" +
-      Date.now();
+          });
 
-    localStorage.setItem("playerId", playerId);
-  }
+        localStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify(newDrafts)
+        );
 
-  const doubleCheckboxes =
-    document.querySelectorAll(".double-checkbox:checked");
+      } catch (error) {
 
-  if (doubleCheckboxes.length > 1) {
-
-    showMessage(
-      "❌ مسموح بـ Double واحد فقط",
-      false
-    );
-
-    return;
-  }
-
-  const selectedDoubleId =
-    getSelectedDoubleMatchId();
-
-  let savedCount = 0;
-
-  let errors = [];
-
-  const saveButton =
-    document.getElementById("saveButton");
-
-  saveButton.disabled = true;
-
-  saveButton.textContent = "⏳ جاري حفظ التوقعات...";
-
-  for (const match of matches) {
-
-    const matchId = String(match.matchId);
-
-    const safeId = matchId.replace(
-      /[^a-zA-Z0-9_-]/g,
-      "_"
-    );
-
-    const homeInput =
-      document.getElementById(`home-${safeId}`);
-
-    const awayInput =
-      document.getElementById(`away-${safeId}`);
-
-    const doubleInput =
-      document.getElementById(`double-${safeId}`);
-
-    if (!homeInput || !awayInput || !doubleInput) {
-      continue;
-    }
-
-    if (
-      homeInput.value === "" ||
-      awayInput.value === ""
-    ) {
-      continue;
-    }
-
-    const isDouble =
-      selectedDoubleId === matchId;
-
-    const payload = {
-
-      action: "submitPrediction",
-
-      playerId: playerId,
-
-      playerName: playerName,
-
-      favoriteTeam: favoriteTeam,
-
-      matchId: matchId,
-
-      homeTeam: match.homeTeam,
-
-      awayTeam: match.awayTeam,
-
-      predictedHome: Number(homeInput.value),
-
-      predictedAway: Number(awayInput.value),
-
-      isDouble: isDouble
-
-    };
-
-    try {
-
-      /*
-        التعديل المهم:
-        إرسال action=submitPrediction في الرابط
-      */
-
-    const response = await fetch(
-  API_URL,
-  {
-    method: "POST",
-
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-
-    body: JSON.stringify(payload)
-  }
-);
-
-      const result = await response.json();
-
-      console.log("PREDICTION RESULT:", result);
-
-      if (result.success) {
-
-        savedCount++;
-
-      } else {
-
-        errors.push(
-          result.message || "حدث خطأ أثناء الحفظ"
+        console.error(
+          "DRAFT SAVE ERROR:",
+          error
         );
 
       }
 
-    } catch (error) {
-
-      console.error("SUBMIT ERROR:", error);
-
-      errors.push("تعذر الاتصال بالسيرفر");
-
     }
 
-  }
 
-  saveButton.disabled = false;
+    /* =====================================================
+       REMOVE SAVED DRAFTS
+    ===================================================== */
 
-  saveButton.textContent = "💾 حفظ كل التوقعات";
+    function removeSavedDrafts(savedMatchIds) {
 
-  if (savedCount > 0) {
+      try {
 
-    showMessage(
-      `✅ تم حفظ ${savedCount} توقع بنجاح`,
-      true
-    );
+        const drafts =
+          getDraftPredictions();
 
-  } else {
+        savedMatchIds.forEach(matchId => {
 
-    showMessage(
-      errors.length
-        ? "❌ " + errors[0]
-        : "⚠️ لم يتم حفظ أي توقع",
-      false
-    );
+          delete drafts[String(matchId)];
 
-  }
+        });
 
-}
+        if (Object.keys(drafts).length === 0) {
 
+          localStorage.removeItem(DRAFT_KEY);
 
-/* =====================================================
-   LOAD LEADERBOARD
-===================================================== */
+        } else {
 
-async function loadLeaderboard() {
+          localStorage.setItem(
+            DRAFT_KEY,
+            JSON.stringify(drafts)
+          );
 
-  const container =
-    document.getElementById("leaderboardContainer");
+        }
 
-  container.innerHTML =
-    '<div class="loading">جاري تحميل الترتيب...</div>';
+      } catch (error) {
 
-  try {
+        console.error(
+          "DRAFT REMOVE ERROR:",
+          error
+        );
 
-    const response = await fetch(
-      `${API_URL}?action=leaderboard&t=${Date.now()}`,
-      {
-        method: "GET",
-        cache: "no-store"
       }
+
+    }
+
+
+    /* =====================================================
+       LOAD MATCHES
+    ===================================================== */
+
+    async function loadMatches() {
+
+      if (isLoadingMatches) {
+        return;
+      }
+
+      isLoadingMatches = true;
+
+      const container =
+        document.getElementById(
+          "matchesContainer"
+        );
+
+      /*
+        لا نمسح المباريات الحالية أثناء التحديث،
+        حتى لا تختفي القيم المكتوبة.
+      */
+
+      if (!matches.length) {
+
+        container.innerHTML =
+          '<div class="loading">جاري تحميل المباريات...</div>';
+
+      }
+
+      try {
+
+        const response = await fetch(
+          `${API_URL}?action=matches&t=${Date.now()}`,
+          {
+            method: "GET",
+            cache: "no-store"
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "HTTP Error: " + response.status
+          );
+        }
+
+        const data =
+          await response.json();
+
+        console.log(
+          "MATCHES FROM SERVER:",
+          data
+        );
+
+        if (!data.success) {
+
+          throw new Error(
+            data.message ||
+            "فشل تحميل المباريات"
+          );
+
+        }
+
+        matches =
+          Array.isArray(data.matches)
+            ? data.matches
+            : [];
+
+        renderMatches();
+
+      } catch (error) {
+
+        console.error(
+          "LOAD MATCHES ERROR:",
+          error
+        );
+
+        /*
+          لا نمسح المباريات القديمة لو كانت موجودة.
+        */
+
+        if (!matches.length) {
+
+          container.innerHTML = `
+            <div class="no-matches">
+              ❌ حدث خطأ أثناء تحميل المباريات
+              <br><br>
+              حاول تحديث الصفحة
+            </div>
+          `;
+
+        }
+
+      } finally {
+
+        isLoadingMatches = false;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       RENDER MATCHES
+    ===================================================== */
+
+    function renderMatches() {
+
+      const container =
+        document.getElementById(
+          "matchesContainer"
+        );
+
+      if (!matches.length) {
+
+        container.innerHTML = `
+          <div class="no-matches">
+            لا توجد مباريات حاليًا
+          </div>
+        `;
+
+        return;
+
+      }
+
+      /*
+        حفظ أي قيم مكتوبة قبل إعادة بناء الصفحة.
+      */
+
+      saveDraftPredictions();
+
+      const drafts =
+        getDraftPredictions();
+
+      container.innerHTML = "";
+
+      matches.forEach(match => {
+
+        const matchId =
+          String(match.matchId);
+
+        const safeId =
+          getSafeMatchId(matchId);
+
+        const draft =
+          drafts[matchId] || {};
+
+        const matchElement =
+          document.createElement("div");
+
+        matchElement.className = "match";
+
+        matchElement.dataset.matchId =
+          matchId;
+
+        matchElement.innerHTML = `
+
+          <div class="teams">
+
+            <div class="team">
+              ${escapeHtml(match.homeTeam)}
+            </div>
+
+            <div class="vs">
+              VS
+            </div>
+
+            <div class="team">
+              ${escapeHtml(match.awayTeam)}
+            </div>
+
+          </div>
+
+          <div class="scores">
+
+            <div>
+
+              <label>
+                أهداف ${escapeHtml(match.homeTeam)}
+              </label>
+
+              <input
+                type="number"
+                min="0"
+                max="99"
+                id="home-${safeId}"
+                placeholder="0"
+                value="${escapeHtml(
+                  draft.predictedHome || ""
+                )}"
+              >
+
+            </div>
+
+            <div>
+
+              <label>
+                أهداف ${escapeHtml(match.awayTeam)}
+              </label>
+
+              <input
+                type="number"
+                min="0"
+                max="99"
+                id="away-${safeId}"
+                placeholder="0"
+                value="${escapeHtml(
+                  draft.predictedAway || ""
+                )}"
+              >
+
+            </div>
+
+          </div>
+
+          <label class="double-box">
+
+            <input
+              type="checkbox"
+              class="double-checkbox"
+              data-match-id="${escapeHtml(matchId)}"
+              id="double-${safeId}"
+              ${draft.isDouble ? "checked" : ""}
+            >
+
+            مباراة Double ×2
+
+          </label>
+
+          <div
+            class="double-warning"
+            id="warning-${safeId}"
+          >
+            ⚠️ مسموح بـ Double واحد فقط
+          </div>
+
+        `;
+
+        container.appendChild(matchElement);
+
+        const homeInput =
+          document.getElementById(
+            `home-${safeId}`
+          );
+
+        const awayInput =
+          document.getElementById(
+            `away-${safeId}`
+          );
+
+        const doubleInput =
+          document.getElementById(
+            `double-${safeId}`
+          );
+
+        if (homeInput) {
+
+          homeInput.addEventListener(
+            "input",
+            saveDraftPredictions
+          );
+
+        }
+
+        if (awayInput) {
+
+          awayInput.addEventListener(
+            "input",
+            saveDraftPredictions
+          );
+
+        }
+
+        if (doubleInput) {
+
+          doubleInput.addEventListener(
+            "change",
+            function () {
+
+              handleDoubleSelection(this);
+
+              saveDraftPredictions();
+
+            }
+          );
+
+        }
+
+      });
+
+    }
+
+
+    /* =====================================================
+       DOUBLE SELECTION
+    ===================================================== */
+
+    function handleDoubleSelection(
+      selectedCheckbox
+    ) {
+
+      const allDoubleCheckboxes =
+        document.querySelectorAll(
+          ".double-checkbox"
+        );
+
+      if (!selectedCheckbox.checked) {
+        return;
+      }
+
+      allDoubleCheckboxes.forEach(
+        checkbox => {
+
+          if (checkbox !== selectedCheckbox) {
+
+            checkbox.checked = false;
+
+          }
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       GET SELECTED DOUBLE
+    ===================================================== */
+
+    function getSelectedDoubleMatchId() {
+
+      const selected =
+        document.querySelector(
+          ".double-checkbox:checked"
+        );
+
+      if (!selected) {
+        return null;
+      }
+
+      return String(
+        selected.dataset.matchId
+      );
+
+    }
+
+
+    /* =====================================================
+       SUBMIT ALL PREDICTIONS
+    ===================================================== */
+
+    async function submitAllPredictions() {
+
+      if (isSavingPredictions) {
+        return;
+      }
+
+      const playerName =
+        document
+          .getElementById("playerName")
+          .value
+          .trim();
+
+      const favoriteTeam =
+        document
+          .getElementById("favoriteTeam")
+          .value
+          .trim();
+
+      if (!playerName) {
+
+        showMessage(
+          "اكتب اسمك أولًا",
+          false
+        );
+
+        return;
+
+      }
+
+      localStorage.setItem(
+        "playerName",
+        playerName
+      );
+
+      localStorage.setItem(
+        "favoriteTeam",
+        favoriteTeam
+      );
+
+      let playerId =
+        localStorage.getItem("playerId");
+
+      if (!playerId) {
+
+        playerId =
+          playerName
+            .toLowerCase()
+            .replace(/\s+/g, "-") +
+          "-" +
+          Date.now();
+
+        localStorage.setItem(
+          "playerId",
+          playerId
+        );
+
+      }
+
+      const doubleCheckboxes =
+        document.querySelectorAll(
+          ".double-checkbox:checked"
+        );
+
+      if (doubleCheckboxes.length > 1) {
+
+        showMessage(
+          "❌ مسموح بـ Double واحد فقط",
+          false
+        );
+
+        return;
+
+      }
+
+      const selectedDoubleId =
+        getSelectedDoubleMatchId();
+
+      let savedCount = 0;
+
+      let errors = [];
+
+      let savedMatchIds = [];
+
+      const saveButton =
+        document.getElementById(
+          "saveButton"
+        );
+
+      isSavingPredictions = true;
+
+      saveButton.disabled = true;
+
+      saveButton.textContent =
+        "⏳ جاري حفظ التوقعات...";
+
+      /*
+        نحفظ المسودة قبل بداية الإرسال.
+      */
+
+      saveDraftPredictions();
+
+      for (const match of matches) {
+
+        const matchId =
+          String(match.matchId);
+
+        const safeId =
+          getSafeMatchId(matchId);
+
+        const homeInput =
+          document.getElementById(
+            `home-${safeId}`
+          );
+
+        const awayInput =
+          document.getElementById(
+            `away-${safeId}`
+          );
+
+        if (!homeInput || !awayInput) {
+          continue;
+        }
+
+        /*
+          لا نحفظ الماتش لو اللاعب لم يكتب النتيجة.
+        */
+
+        if (
+          homeInput.value === "" ||
+          awayInput.value === ""
+        ) {
+
+          continue;
+
+        }
+
+        const predictedHome =
+          Number(homeInput.value);
+
+        const predictedAway =
+          Number(awayInput.value);
+
+        if (
+          !Number.isInteger(predictedHome) ||
+          !Number.isInteger(predictedAway) ||
+          predictedHome < 0 ||
+          predictedAway < 0 ||
+          predictedHome > 99 ||
+          predictedAway > 99
+        ) {
+
+          errors.push(
+            `النتيجة غير صحيحة في مباراة ${match.homeTeam} ضد ${match.awayTeam}`
+          );
+
+          continue;
+
+        }
+
+        const isDouble =
+          selectedDoubleId === matchId;
+
+        const payload = {
+
+          action: "submitPrediction",
+
+          playerId: playerId,
+
+          playerName: playerName,
+
+          favoriteTeam: favoriteTeam,
+
+          matchId: matchId,
+
+          homeTeam: match.homeTeam,
+
+          awayTeam: match.awayTeam,
+
+          predictedHome: predictedHome,
+
+          predictedAway: predictedAway,
+
+          isDouble: isDouble
+
+        };
+
+        try {
+
+          const response =
+            await fetch(
+              API_URL,
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "text/plain;charset=utf-8"
+                },
+
+                body: JSON.stringify(payload)
+              }
+            );
+
+          if (!response.ok) {
+
+            throw new Error(
+              "HTTP Error: " + response.status
+            );
+
+          }
+
+          const result =
+            await response.json();
+
+          console.log(
+            "PREDICTION RESULT:",
+            result
+          );
+
+          if (result.success) {
+
+            savedCount++;
+
+            savedMatchIds.push(matchId);
+
+          } else {
+
+            errors.push(
+              result.message ||
+              `فشل حفظ مباراة ${match.homeTeam} ضد ${match.awayTeam}`
+            );
+
+          }
+
+        } catch (error) {
+
+          console.error(
+            "SUBMIT ERROR:",
+            error
+          );
+
+          errors.push(
+            `تعذر حفظ مباراة ${match.homeTeam} ضد ${match.awayTeam}`
+          );
+
+        }
+
+      }
+
+      /*
+        نمسح فقط التوقعات التي تم حفظها بنجاح.
+      */
+
+      if (savedMatchIds.length > 0) {
+
+        removeSavedDrafts(
+          savedMatchIds
+        );
+
+      }
+
+      isSavingPredictions = false;
+
+      saveButton.disabled = false;
+
+      saveButton.textContent =
+        "💾 حفظ كل التوقعات";
+
+      if (savedCount > 0) {
+
+        if (errors.length > 0) {
+
+          showMessage(
+            `✅ تم حفظ ${savedCount} توقع، لكن يوجد ${errors.length} مشكلة`,
+            true
+          );
+
+        } else {
+
+          showMessage(
+            `✅ تم حفظ ${savedCount} توقع بنجاح`,
+            true
+          );
+
+        }
+
+      } else {
+
+        showMessage(
+          errors.length > 0
+            ? "❌ " + errors[0]
+            : "⚠️ لم يتم حفظ أي توقع",
+          false
+        );
+
+      }
+
+    }
+
+
+    /* =====================================================
+       LOAD LEADERBOARD
+    ===================================================== */
+
+    async function loadLeaderboard() {
+
+      const container =
+        document.getElementById(
+          "leaderboardContainer"
+        );
+
+      container.innerHTML =
+        '<div class="loading">جاري تحميل الترتيب...</div>';
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_URL}?action=leaderboard&t=${Date.now()}`,
+            {
+              method: "GET",
+              cache: "no-store"
+            }
+          );
+
+        if (!response.ok) {
+
+          throw new Error(
+            "HTTP Error: " + response.status
+          );
+
+        }
+
+        const data =
+          await response.json();
+
+        if (
+          !data.success &&
+          !Array.isArray(data.leaderboard)
+        ) {
+
+          throw new Error(
+            data.message ||
+            "فشل تحميل الترتيب"
+          );
+
+        }
+
+        renderLeaderboard(
+          data.leaderboard || []
+        );
+
+      } catch (error) {
+
+        console.error(
+          "LEADERBOARD ERROR:",
+          error
+        );
+
+        container.innerHTML =
+          "<p>❌ تعذر تحميل الترتيب</p>";
+
+      }
+
+    }
+
+
+    /* =====================================================
+       RENDER LEADERBOARD
+    ===================================================== */
+
+    function renderLeaderboard(players) {
+
+      const container =
+        document.getElementById(
+          "leaderboardContainer"
+        );
+
+      if (!players.length) {
+
+        container.innerHTML = `
+          <div class="no-matches">
+            لا يوجد ترتيب حاليًا
+          </div>
+        `;
+
+        return;
+
+      }
+
+      let html = `
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>المركز</th>
+              <th>اللاعب</th>
+              <th>الفريق المفضل</th>
+              <th>النقاط</th>
+              <th>المباريات</th>
+              <th>Exact</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+      `;
+
+      players.forEach(player => {
+
+        const rank =
+          Number(player.rank);
+
+        const firstClass =
+          rank === 1
+            ? "first-place"
+            : "";
+
+        html += `
+
+          <tr>
+
+            <td class="${firstClass}">
+              ${rank === 1 ? "🥇" : rank}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                player.playerName
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                player.favoriteTeam || "-"
+              )}
+            </td>
+
+            <td>
+              <strong>
+                ${Number(
+                  player.totalPoints || 0
+                )}
+              </strong>
+            </td>
+
+            <td>
+              ${Number(
+                player.playedMatches || 0
+              )}
+            </td>
+
+            <td>
+              ${Number(
+                player.exactMatches || 0
+              )}
+            </td>
+
+          </tr>
+
+        `;
+
+      });
+
+      html += `
+
+          </tbody>
+
+        </table>
+
+      `;
+
+      container.innerHTML = html;
+
+    }
+
+
+    /* =====================================================
+       MESSAGE
+    ===================================================== */
+
+    function showMessage(
+      text,
+      success
+    ) {
+
+      const message =
+        document.getElementById(
+          "message"
+        );
+
+      message.textContent = text;
+
+      message.className =
+        "message " +
+        (success ? "success" : "error");
+
+      message.style.display =
+        "block";
+
+      setTimeout(() => {
+
+        message.style.display =
+          "none";
+
+      }, 5000);
+
+    }
+
+
+    /* =====================================================
+       LOGOUT
+    ===================================================== */
+
+    function logout() {
+
+      localStorage.removeItem(
+        "userType"
+      );
+
+      localStorage.removeItem(
+        "playerName"
+      );
+
+      localStorage.removeItem(
+        "favoriteTeam"
+      );
+
+      localStorage.removeItem(
+        "playerId"
+      );
+
+      localStorage.removeItem(
+        DRAFT_KEY
+      );
+
+      window.location.href =
+        "login.html";
+
+    }
+
+
+    /* =====================================================
+       START
+    ===================================================== */
+
+    loadMatches();
+
+    loadLeaderboard();
+
+    /*
+      تحديث المباريات كل دقيقة بدون
+      مسح التوقعات المكتوبة.
+    */
+
+    setInterval(
+      loadMatches,
+      60000
     );
 
-    if (!response.ok) {
-      throw new Error("HTTP Error: " + response.status);
-    }
-
-    const data = await response.json();
-
-    if (!data.success && !Array.isArray(data.leaderboard)) {
-      throw new Error(data.message || "فشل تحميل الترتيب");
-    }
-
-    renderLeaderboard(data.leaderboard || []);
-
-  } catch (error) {
-
-    console.error("LEADERBOARD ERROR:", error);
-
-    container.innerHTML =
-      "<p>❌ تعذر تحميل الترتيب</p>";
-
-  }
-
-}
-
-
-/* =====================================================
-   RENDER LEADERBOARD
-===================================================== */
-
-function renderLeaderboard(players) {
-
-  const container =
-    document.getElementById("leaderboardContainer");
-
-  if (!players.length) {
-
-    container.innerHTML = `
-      <div class="no-matches">
-        لا يوجد ترتيب حاليًا
-      </div>
-    `;
-
-    return;
-  }
-
-  let html = `
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>المركز</th>
-          <th>اللاعب</th>
-          <th>الفريق المفضل</th>
-          <th>النقاط</th>
-          <th>المباريات</th>
-          <th>Exact</th>
-
-        </tr>
-
-      </thead>
-
-      <tbody>
-
-  `;
-
-  players.forEach(player => {
-
-    const rank = Number(player.rank);
-
-    const firstClass =
-      rank === 1 ? "first-place" : "";
-
-    html += `
-
-      <tr>
-
-        <td class="${firstClass}">
-          ${rank === 1 ? "🥇" : rank}
-        </td>
-
-        <td>
-          ${escapeHtml(player.playerName)}
-        </td>
-
-        <td>
-          ${escapeHtml(player.favoriteTeam || "-")}
-        </td>
-
-        <td>
-          <strong>
-            ${Number(player.totalPoints || 0)}
-          </strong>
-        </td>
-
-        <td>
-          ${Number(player.playedMatches || 0)}
-        </td>
-
-        <td>
-          ${Number(player.exactMatches || 0)}
-        </td>
-
-      </tr>
-
-    `;
-
-  });
-
-  html += `
-
-      </tbody>
-
-    </table>
-
-  `;
-
-  container.innerHTML = html;
-}
-
-
-/* =====================================================
-   MESSAGE
-===================================================== */
-
-function showMessage(text, success) {
-
-  const message =
-    document.getElementById("message");
-
-  message.textContent = text;
-
-  message.className =
-    "message " + (success ? "success" : "error");
-
-  message.style.display = "block";
-
-  setTimeout(() => {
-
-    message.style.display = "none";
-
-  }, 5000);
-
-}
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-function logout() {
-
-  localStorage.removeItem("userType");
-
-  localStorage.removeItem("playerName");
-
-  localStorage.removeItem("favoriteTeam");
-
-  localStorage.removeItem("playerId");
-
-  window.location.href = "login.html";
-
-}
-
-
-/* =====================================================
-   START
-===================================================== */
-
-loadMatches();
-
-loadLeaderboard();
-
-setInterval(loadMatches, 60000);
-
-setInterval(loadLeaderboard, 10000);
-
-</script>
+    /*
+      تحديث الترتيب كل 10 ثواني.
+    */
+
+    setInterval(
+      loadLeaderboard,
+      10000
+    );
+
+  </script>
 
 </body>
 </html>
