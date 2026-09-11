@@ -1,17 +1,13 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
-
   <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>توقعات المباريات</title>
 
   <style>
-
     * {
       box-sizing: border-box;
       font-family: Arial, sans-serif;
@@ -80,6 +76,11 @@
 
     button:hover {
       background: #0369a1;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .logout {
@@ -197,7 +198,6 @@
     }
 
     @media (max-width: 600px) {
-
       .teams {
         grid-template-columns: 1fr;
       }
@@ -209,51 +209,30 @@
       .scores {
         grid-template-columns: 1fr;
       }
-
     }
-
   </style>
-
 </head>
-
 
 <body>
 
 <div class="container">
 
-
-  <button class="logout"
-          onclick="logout()">
-
+  <button class="logout" onclick="logout()">
     تسجيل الخروج
-
   </button>
 
-
-  <h1>
-    ⚽ توقعات مباريات كرة القدم
-  </h1>
-
+  <h1>⚽ توقعات مباريات كرة القدم</h1>
 
   <p class="subtitle">
     توقع النتائج وتابع ترتيب المتسابقين
   </p>
 
-
-  <!-- بيانات المتسابق -->
-
   <div class="card">
 
-    <h2>
-      بيانات المتسابق
-    </h2>
-
+    <h2>بيانات المتسابق</h2>
     <br>
 
-
-    <label for="playerName">
-      اسم المتسابق
-    </label>
+    <label for="playerName">اسم المتسابق</label>
 
     <input
       id="playerName"
@@ -261,10 +240,7 @@
       placeholder="اسمك"
     >
 
-
-    <label for="favoriteTeam">
-      الفريق المفضل
-    </label>
+    <label for="favoriteTeam">الفريق المفضل</label>
 
     <input
       id="favoriteTeam"
@@ -274,83 +250,53 @@
 
   </div>
 
-
-  <!-- المباريات -->
-
   <div class="card">
 
-    <h2>
-      ⚽ المباريات
-    </h2>
-
+    <h2>⚽ المباريات</h2>
     <br>
 
-
     <div id="matchesContainer">
-
       <div class="loading">
         جاري تحميل المباريات...
       </div>
-
     </div>
 
-
-    <button onclick="submitAllPredictions()">
-
+    <button id="saveButton" onclick="submitAllPredictions()">
       💾 حفظ كل التوقعات
-
     </button>
 
-
-    <div
-      id="message"
-      class="message">
-    </div>
+    <div id="message" class="message"></div>
 
   </div>
 
-
-  <!-- الترتيب -->
-
   <div class="card">
 
-    <h2>
-      🏆 ترتيب المتسابقين
-    </h2>
-
+    <h2>🏆 ترتيب المتسابقين</h2>
     <br>
 
-
-    <button
-      class="refresh"
-      onclick="loadLeaderboard()">
-
+    <button class="refresh" onclick="loadLeaderboard()">
       🔄 تحديث الترتيب الآن
-
     </button>
 
-
     <div id="leaderboardContainer">
-
       <div class="loading">
         جاري تحميل الترتيب...
       </div>
-
     </div>
 
   </div>
 
 </div>
 
-
 <script>
 
-
 /* =====================================================
-   API - NEW URL
+   API
 ===================================================== */
+
+// تم تعديل الرابط: بدون ?action=matches
 const API_URL =
- "https://script.google.com/macros/s/AKfycbw_DCKr89kd30z5h6qgPO-rauUCaaUg0ZJKZxIkLbjEQ7gyojC5tW267iY01W6_t-w/exec?action=matches"
+  "https://script.google.com/macros/s/AKfycbw_DCKr89kd30z5h6qgPO-rauUCaaUg0ZJKZxIkLbjEQ7gyojC5tW267iY01W6_t-w/exec";
 
 
 let matches = [];
@@ -360,15 +306,10 @@ let matches = [];
    CHECK USER
 ===================================================== */
 
-const userType =
-  localStorage.getItem("userType");
-
+const userType = localStorage.getItem("userType");
 
 if (userType !== "player") {
-
-  window.location.href =
-    "login.html";
-
+  window.location.href = "login.html";
 }
 
 
@@ -376,20 +317,11 @@ if (userType !== "player") {
    PLAYER DATA
 ===================================================== */
 
-document.getElementById(
-  "playerName"
-).value =
-  localStorage.getItem(
-    "playerName"
-  ) || "";
+document.getElementById("playerName").value =
+  localStorage.getItem("playerName") || "";
 
-
-document.getElementById(
-  "favoriteTeam"
-).value =
-  localStorage.getItem(
-    "favoriteTeam"
-  ) || "";
+document.getElementById("favoriteTeam").value =
+  localStorage.getItem("favoriteTeam") || "";
 
 
 /* =====================================================
@@ -398,43 +330,16 @@ document.getElementById(
 
 function escapeHtml(value) {
 
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
+  if (value === null || value === undefined) {
     return "";
-
   }
 
-
   return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 
@@ -445,95 +350,53 @@ function escapeHtml(value) {
 async function loadMatches() {
 
   const container =
-    document.getElementById(
-      "matchesContainer"
-    );
-
+    document.getElementById("matchesContainer");
 
   container.innerHTML =
     '<div class="loading">جاري تحميل المباريات...</div>';
 
-
   try {
 
-    const response =
-      await fetch(
-
-        `${API_URL}?action=matches&t=${Date.now()}`,
-
-        {
-          method: "GET",
-          cache: "no-store"
-        }
-
-      );
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        "HTTP Error: " +
-        response.status
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    console.log(
-      "MATCHES FROM SERVER:",
-      data
+    const response = await fetch(
+      `${API_URL}?action=matches&t=${Date.now()}`,
+      {
+        method: "GET",
+        cache: "no-store"
+      }
     );
 
-
-    if (!data.success) {
-
-      throw new Error(
-        data.message ||
-        "فشل تحميل المباريات"
-      );
-
+    if (!response.ok) {
+      throw new Error("HTTP Error: " + response.status);
     }
 
+    const data = await response.json();
 
-    matches =
-      Array.isArray(
-        data.matches
-      )
-        ? data.matches
-        : [];
+    console.log("MATCHES FROM SERVER:", data);
 
+    if (!data.success) {
+      throw new Error(
+        data.message || "فشل تحميل المباريات"
+      );
+    }
+
+    matches = Array.isArray(data.matches)
+      ? data.matches
+      : [];
 
     renderMatches();
 
-
   } catch (error) {
 
-    console.error(
-      "LOAD MATCHES ERROR:",
-      error
-    );
-
+    console.error("LOAD MATCHES ERROR:", error);
 
     container.innerHTML = `
-
       <div class="no-matches">
-
         ❌ حدث خطأ أثناء تحميل المباريات
-
         <br><br>
-
         حاول تحديث الصفحة
-
       </div>
-
     `;
-
   }
-
 }
 
 
@@ -544,228 +407,138 @@ async function loadMatches() {
 function renderMatches() {
 
   const container =
-    document.getElementById(
-      "matchesContainer"
-    );
-
+    document.getElementById("matchesContainer");
 
   if (!matches.length) {
 
     container.innerHTML = `
-
       <div class="no-matches">
-
         لا توجد مباريات حاليًا
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = "";
+
+  matches.forEach(match => {
+
+    const matchId = String(match.matchId);
+
+    const safeId = matchId.replace(
+      /[^a-zA-Z0-9_-]/g,
+      "_"
+    );
+
+    const matchElement = document.createElement("div");
+
+    matchElement.className = "match";
+
+    matchElement.innerHTML = `
+
+      <div class="teams">
+
+        <div class="team">
+          ${escapeHtml(match.homeTeam)}
+        </div>
+
+        <div class="vs">
+          VS
+        </div>
+
+        <div class="team">
+          ${escapeHtml(match.awayTeam)}
+        </div>
+
+      </div>
+
+      <div class="scores">
+
+        <div>
+
+          <label>
+            أهداف ${escapeHtml(match.homeTeam)}
+          </label>
+
+          <input
+            type="number"
+            min="0"
+            max="99"
+            id="home-${safeId}"
+            placeholder="0"
+          >
+
+        </div>
+
+        <div>
+
+          <label>
+            أهداف ${escapeHtml(match.awayTeam)}
+          </label>
+
+          <input
+            type="number"
+            min="0"
+            max="99"
+            id="away-${safeId}"
+            placeholder="0"
+          >
+
+        </div>
+
+      </div>
+
+      <label class="double-box">
+
+        <input
+          type="checkbox"
+          class="double-checkbox"
+          data-match-id="${escapeHtml(matchId)}"
+          id="double-${safeId}"
+          onchange="handleDoubleSelection(this)"
+        >
+
+        مباراة Double ×2
+
+      </label>
+
+      <div
+        class="double-warning"
+        id="warning-${safeId}">
+
+        ⚠️ مسموح بـ Double واحد فقط
 
       </div>
 
     `;
 
-    return;
+    container.appendChild(matchElement);
 
-  }
-
-
-  container.innerHTML = "";
-
-
-  matches.forEach(
-    (match) => {
-
-      const matchId =
-        String(match.matchId);
-
-
-      const safeId =
-        matchId.replace(
-          /[^a-zA-Z0-9_-]/g,
-          "_"
-        );
-
-
-      const matchElement =
-        document.createElement(
-          "div"
-        );
-
-
-      matchElement.className =
-        "match";
-
-
-      matchElement.innerHTML = `
-
-        <div class="teams">
-
-          <div class="team">
-
-            ${escapeHtml(
-              match.homeTeam
-            )}
-
-          </div>
-
-
-          <div class="vs">
-            VS
-          </div>
-
-
-          <div class="team">
-
-            ${escapeHtml(
-              match.awayTeam
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="scores">
-
-          <div>
-
-            <label>
-
-              أهداف
-              ${escapeHtml(
-                match.homeTeam
-              )}
-
-            </label>
-
-
-            <input
-
-              type="number"
-
-              min="0"
-
-              max="99"
-
-              id="home-${safeId}"
-
-              placeholder="0"
-
-            >
-
-          </div>
-
-
-          <div>
-
-            <label>
-
-              أهداف
-              ${escapeHtml(
-                match.awayTeam
-              )}
-
-            </label>
-
-
-            <input
-
-              type="number"
-
-              min="0"
-
-              max="99"
-
-              id="away-${safeId}"
-
-              placeholder="0"
-
-            >
-
-          </div>
-
-        </div>
-
-
-        <label class="double-box">
-
-          <input
-
-            type="checkbox"
-
-            class="double-checkbox"
-
-            data-match-id="${escapeHtml(
-              matchId
-            )}"
-
-            id="double-${safeId}"
-
-            onchange="handleDoubleSelection(this)"
-
-          >
-
-          مباراة Double ×2
-
-        </label>
-
-
-        <div
-          class="double-warning"
-          id="warning-${safeId}">
-
-          ⚠️ مسموح بـ Double واحد فقط
-
-        </div>
-
-      `;
-
-
-      container.appendChild(
-        matchElement
-      );
-
-    }
-  );
-
+  });
 }
 
 
 /* =====================================================
    DOUBLE SELECTION
-   يسمح بـ Double واحد فقط
 ===================================================== */
 
-function handleDoubleSelection(
-  selectedCheckbox
-) {
+function handleDoubleSelection(selectedCheckbox) {
 
   const allDoubleCheckboxes =
-    document.querySelectorAll(
-      ".double-checkbox"
-    );
-
+    document.querySelectorAll(".double-checkbox");
 
   if (!selectedCheckbox.checked) {
-
     return;
-
   }
 
+  allDoubleCheckboxes.forEach(checkbox => {
 
-  allDoubleCheckboxes.forEach(
-    checkbox => {
-
-      if (
-        checkbox !==
-        selectedCheckbox
-      ) {
-
-        checkbox.checked =
-          false;
-
-      }
-
+    if (checkbox !== selectedCheckbox) {
+      checkbox.checked = false;
     }
-  );
 
+  });
 }
 
 
@@ -776,22 +549,13 @@ function handleDoubleSelection(
 function getSelectedDoubleMatchId() {
 
   const selected =
-    document.querySelector(
-      ".double-checkbox:checked"
-    );
-
+    document.querySelector(".double-checkbox:checked");
 
   if (!selected) {
-
     return null;
-
   }
 
-
-  return String(
-    selected.dataset.matchId
-  );
-
+  return String(selected.dataset.matchId);
 }
 
 
@@ -802,87 +566,38 @@ function getSelectedDoubleMatchId() {
 async function submitAllPredictions() {
 
   const playerName =
-    document
-      .getElementById(
-        "playerName"
-      )
-      .value
-      .trim();
-
+    document.getElementById("playerName").value.trim();
 
   const favoriteTeam =
-    document
-      .getElementById(
-        "favoriteTeam"
-      )
-      .value
-      .trim();
-
+    document.getElementById("favoriteTeam").value.trim();
 
   if (!playerName) {
 
-    showMessage(
-      "اكتب اسمك أولًا",
-      false
-    );
+    showMessage("اكتب اسمك أولًا", false);
 
     return;
-
   }
 
+  localStorage.setItem("playerName", playerName);
 
-  localStorage.setItem(
-    "playerName",
-    playerName
-  );
+  localStorage.setItem("favoriteTeam", favoriteTeam);
 
-
-  localStorage.setItem(
-    "favoriteTeam",
-    favoriteTeam
-  );
-
-
-  let playerId =
-    localStorage.getItem(
-      "playerId"
-    );
-
+  let playerId = localStorage.getItem("playerId");
 
   if (!playerId) {
 
     playerId =
-      playerName
-        .toLowerCase()
-        .replace(
-          /\s+/g,
-          "-"
-        ) +
+      playerName.toLowerCase().replace(/\s+/g, "-") +
       "-" +
       Date.now();
 
-
-    localStorage.setItem(
-      "playerId",
-      playerId
-    );
-
+    localStorage.setItem("playerId", playerId);
   }
 
-
-  /*
-    التأكد مرة أخيرة أن هناك Double واحد فقط
-  */
-
   const doubleCheckboxes =
-    document.querySelectorAll(
-      ".double-checkbox:checked"
-    );
+    document.querySelectorAll(".double-checkbox:checked");
 
-
-  if (
-    doubleCheckboxes.length > 1
-  ) {
+  if (doubleCheckboxes.length > 1) {
 
     showMessage(
       "❌ مسموح بـ Double واحد فقط",
@@ -890,148 +605,101 @@ async function submitAllPredictions() {
     );
 
     return;
-
   }
-
 
   const selectedDoubleId =
     getSelectedDoubleMatchId();
 
-
   let savedCount = 0;
-
 
   let errors = [];
 
+  const saveButton =
+    document.getElementById("saveButton");
 
-  for (
-    const match of matches
-  ) {
+  saveButton.disabled = true;
 
-    const matchId =
-      String(match.matchId);
+  saveButton.textContent = "⏳ جاري حفظ التوقعات...";
 
+  for (const match of matches) {
 
-    const safeId =
-      matchId.replace(
-        /[^a-zA-Z0-9_-]/g,
-        "_"
-      );
+    const matchId = String(match.matchId);
 
+    const safeId = matchId.replace(
+      /[^a-zA-Z0-9_-]/g,
+      "_"
+    );
 
     const homeInput =
-      document.getElementById(
-        `home-${safeId}`
-      );
-
+      document.getElementById(`home-${safeId}`);
 
     const awayInput =
-      document.getElementById(
-        `away-${safeId}`
-      );
-
+      document.getElementById(`away-${safeId}`);
 
     const doubleInput =
-      document.getElementById(
-        `double-${safeId}`
-      );
+      document.getElementById(`double-${safeId}`);
 
-
-    if (
-      !homeInput ||
-      !awayInput ||
-      !doubleInput
-    ) {
-
+    if (!homeInput || !awayInput || !doubleInput) {
       continue;
-
     }
-
 
     if (
       homeInput.value === "" ||
       awayInput.value === ""
     ) {
-
       continue;
-
     }
 
-
     const isDouble =
-      selectedDoubleId ===
-      matchId;
-
+      selectedDoubleId === matchId;
 
     const payload = {
 
-      action:
-        "submitPrediction",
+      action: "submitPrediction",
 
-      playerId:
-        playerId,
+      playerId: playerId,
 
-      playerName:
-        playerName,
+      playerName: playerName,
 
-      favoriteTeam:
-        favoriteTeam,
+      favoriteTeam: favoriteTeam,
 
-      matchId:
-        matchId,
+      matchId: matchId,
 
-      homeTeam:
-        match.homeTeam,
+      homeTeam: match.homeTeam,
 
-      awayTeam:
-        match.awayTeam,
+      awayTeam: match.awayTeam,
 
-      predictedHome:
-        Number(
-          homeInput.value
-        ),
+      predictedHome: Number(homeInput.value),
 
-      predictedAway:
-        Number(
-          awayInput.value
-        ),
+      predictedAway: Number(awayInput.value),
 
-      isDouble:
-        isDouble
+      isDouble: isDouble
 
     };
 
-
     try {
 
-      const response =
-        await fetch(
+      /*
+        التعديل المهم:
+        إرسال action=submitPrediction في الرابط
+      */
 
-          API_URL,
+    const response = await fetch(
+  API_URL,
+  {
+    method: "POST",
 
-          {
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
 
-            method: "POST",
+    body: JSON.stringify(payload)
+  }
+);
 
-            body:
-              JSON.stringify(
-                payload
-              )
+      const result = await response.json();
 
-          }
-
-        );
-
-
-      const result =
-        await response.json();
-
-
-      console.log(
-        "PREDICTION RESULT:",
-        result
-      );
-
+      console.log("PREDICTION RESULT:", result);
 
       if (result.success) {
 
@@ -1040,50 +708,39 @@ async function submitAllPredictions() {
       } else {
 
         errors.push(
-          result.message ||
-          "حدث خطأ"
+          result.message || "حدث خطأ أثناء الحفظ"
         );
 
       }
 
-
     } catch (error) {
 
-      console.error(
-        "SUBMIT ERROR:",
-        error
-      );
+      console.error("SUBMIT ERROR:", error);
 
-
-      errors.push(
-        "تعذر الاتصال بالسيرفر"
-      );
+      errors.push("تعذر الاتصال بالسيرفر");
 
     }
 
   }
 
+  saveButton.disabled = false;
+
+  saveButton.textContent = "💾 حفظ كل التوقعات";
 
   if (savedCount > 0) {
 
     showMessage(
-
       `✅ تم حفظ ${savedCount} توقع بنجاح`,
-
       true
-
     );
 
   } else {
 
     showMessage(
-
       errors.length
         ? "❌ " + errors[0]
         : "⚠️ لم يتم حفظ أي توقع",
-
       false
-
     );
 
   }
@@ -1098,59 +755,36 @@ async function submitAllPredictions() {
 async function loadLeaderboard() {
 
   const container =
-    document.getElementById(
-      "leaderboardContainer"
-    );
-
+    document.getElementById("leaderboardContainer");
 
   container.innerHTML =
     '<div class="loading">جاري تحميل الترتيب...</div>';
 
-
   try {
 
-    const response =
-      await fetch(
-
-        `${API_URL}?action=leaderboard&t=${Date.now()}`,
-
-        {
-
-          method: "GET",
-
-          cache: "no-store"
-
-        }
-
-      );
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        "HTTP Error: " +
-        response.status
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    renderLeaderboard(
-      data.leaderboard || []
+    const response = await fetch(
+      `${API_URL}?action=leaderboard&t=${Date.now()}`,
+      {
+        method: "GET",
+        cache: "no-store"
+      }
     );
 
+    if (!response.ok) {
+      throw new Error("HTTP Error: " + response.status);
+    }
+
+    const data = await response.json();
+
+    if (!data.success && !Array.isArray(data.leaderboard)) {
+      throw new Error(data.message || "فشل تحميل الترتيب");
+    }
+
+    renderLeaderboard(data.leaderboard || []);
 
   } catch (error) {
 
-    console.error(
-      "LEADERBOARD ERROR:",
-      error
-    );
-
+    console.error("LEADERBOARD ERROR:", error);
 
     container.innerHTML =
       "<p>❌ تعذر تحميل الترتيب</p>";
@@ -1164,32 +798,21 @@ async function loadLeaderboard() {
    RENDER LEADERBOARD
 ===================================================== */
 
-function renderLeaderboard(
-  players
-) {
+function renderLeaderboard(players) {
 
   const container =
-    document.getElementById(
-      "leaderboardContainer"
-    );
-
+    document.getElementById("leaderboardContainer");
 
   if (!players.length) {
 
     container.innerHTML = `
-
       <div class="no-matches">
-
         لا يوجد ترتيب حاليًا
-
       </div>
-
     `;
 
     return;
-
   }
-
 
   let html = `
 
@@ -1200,116 +823,62 @@ function renderLeaderboard(
         <tr>
 
           <th>المركز</th>
-
           <th>اللاعب</th>
-
           <th>الفريق المفضل</th>
-
           <th>النقاط</th>
-
           <th>المباريات</th>
-
           <th>Exact</th>
 
         </tr>
 
       </thead>
 
-
       <tbody>
 
   `;
 
+  players.forEach(player => {
 
-  players.forEach(
-    player => {
+    const rank = Number(player.rank);
 
-      const rank =
-        Number(
-          player.rank
-        );
+    const firstClass =
+      rank === 1 ? "first-place" : "";
 
+    html += `
 
-      const firstClass =
-        rank === 1
-          ? "first-place"
-          : "";
+      <tr>
 
+        <td class="${firstClass}">
+          ${rank === 1 ? "🥇" : rank}
+        </td>
 
-      html += `
+        <td>
+          ${escapeHtml(player.playerName)}
+        </td>
 
-        <tr>
+        <td>
+          ${escapeHtml(player.favoriteTeam || "-")}
+        </td>
 
-          <td class="${firstClass}">
+        <td>
+          <strong>
+            ${Number(player.totalPoints || 0)}
+          </strong>
+        </td>
 
-            ${
-              rank === 1
-                ? "🥇"
-                : rank
-            }
+        <td>
+          ${Number(player.playedMatches || 0)}
+        </td>
 
-          </td>
+        <td>
+          ${Number(player.exactMatches || 0)}
+        </td>
 
+      </tr>
 
-          <td>
+    `;
 
-            ${escapeHtml(
-              player.playerName
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(
-              player.favoriteTeam ||
-              "-"
-            )}
-
-          </td>
-
-
-          <td>
-
-            <strong>
-
-              ${Number(
-                player.totalPoints ||
-                0
-              )}
-
-            </strong>
-
-          </td>
-
-
-          <td>
-
-            ${Number(
-              player.playedMatches ||
-              0
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${Number(
-              player.exactMatches ||
-              0
-            )}
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }
-  );
-
+  });
 
   html += `
 
@@ -1319,10 +888,7 @@ function renderLeaderboard(
 
   `;
 
-
-  container.innerHTML =
-    html;
-
+  container.innerHTML = html;
 }
 
 
@@ -1330,43 +896,23 @@ function renderLeaderboard(
    MESSAGE
 ===================================================== */
 
-function showMessage(
-  text,
-  success
-) {
+function showMessage(text, success) {
 
   const message =
-    document.getElementById(
-      "message"
-    );
+    document.getElementById("message");
 
-
-  message.textContent =
-    text;
-
+  message.textContent = text;
 
   message.className =
-    "message " +
-    (
-      success
-        ? "success"
-        : "error"
-    );
+    "message " + (success ? "success" : "error");
 
+  message.style.display = "block";
 
-  message.style.display =
-    "block";
+  setTimeout(() => {
 
+    message.style.display = "none";
 
-  setTimeout(
-    () => {
-
-      message.style.display =
-        "none";
-
-    },
-    5000
-  );
+  }, 5000);
 
 }
 
@@ -1377,25 +923,15 @@ function showMessage(
 
 function logout() {
 
-  localStorage.removeItem(
-    "userType"
-  );
+  localStorage.removeItem("userType");
 
-  localStorage.removeItem(
-    "playerName"
-  );
+  localStorage.removeItem("playerName");
 
-  localStorage.removeItem(
-    "favoriteTeam"
-  );
+  localStorage.removeItem("favoriteTeam");
 
-  localStorage.removeItem(
-    "playerId"
-  );
+  localStorage.removeItem("playerId");
 
-
-  window.location.href =
-    "login.html";
+  window.location.href = "login.html";
 
 }
 
@@ -1408,28 +944,12 @@ loadMatches();
 
 loadLeaderboard();
 
+setInterval(loadMatches, 60000);
 
-/*
-  تحديث المباريات كل دقيقة
-*/
-
-setInterval(
-  loadMatches,
-  60000
-);
-
-
-/*
-  تحديث الترتيب كل 10 ثواني
-*/
-
-setInterval(
-  loadLeaderboard,
-  10000
-);
+setInterval(loadLeaderboard, 10000);
 
 </script>
 
 </body>
-
 </html>
+
